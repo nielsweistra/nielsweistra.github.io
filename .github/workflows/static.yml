@@ -32,7 +32,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          repository: 'ielsweistra/NO.FastAPI.Demo'
+          repository: 'nielsweistra/NO.FastAPI.Demo'
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Upload artifact

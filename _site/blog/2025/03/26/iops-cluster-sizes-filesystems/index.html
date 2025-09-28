@@ -4,27 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    {% if page.title %}
-        <title>{{ page.title }} | {{ site.title }}</title>
-    {% else %}
-        <title>{{ site.title }}</title>
-    {% endif %}
     
-    <meta name="description" content="{% if page.excerpt %}{{ page.excerpt | strip_html | strip_newlines | truncate: 160 }}{% else %}{{ site.description }}{% endif %}">
+        <title>Why IOPS, Cluster Sizes, and Filesystems Matter in Kubernetes | Niels Weistra - DevOps Engineer & Cloud Architect</title>
+    
+    
+    <meta name="description" content="Deep dive into storage performance considerations for Kubernetes workloads, including IOPS optimization, cluster sizing strategies, and filesystem selection ...">
     <meta name="keywords" content="Niels Weistra, DevOps, Cloud Architecture, Kubernetes, Azure, GitOps, ITlusions, Cloud-Native, DevSecOps">
-    <meta name="author" content="{{ site.author.name }}">
+    <meta name="author" content="Niels Weistra">
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="{{ site.url }}{{ page.url }}">
-    <meta property="og:title" content="{% if page.title %}{{ page.title }}{% else %}{{ site.title }}{% endif %}">
-    <meta property="og:description" content="{% if page.excerpt %}{{ page.excerpt | strip_html | strip_newlines | truncate: 160 }}{% else %}{{ site.description }}{% endif %}">
+    <meta property="og:url" content="http://0.0.0.0:4000/blog/2025/03/26/iops-cluster-sizes-filesystems/">
+    <meta property="og:title" content="Why IOPS, Cluster Sizes, and Filesystems Matter in Kubernetes">
+    <meta property="og:description" content="Deep dive into storage performance considerations for Kubernetes workloads, including IOPS optimization, cluster sizing strategies, and filesystem selection ...">
     
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="{{ site.url }}{{ page.url }}">
-    <meta property="twitter:title" content="{% if page.title %}{{ page.title }}{% else %}{{ site.title }}{% endif %}">
-    <meta property="twitter:description" content="{% if page.excerpt %}{{ page.excerpt | strip_html | strip_newlines | truncate: 160 }}{% else %}{{ site.description }}{% endif %}">
+    <meta property="twitter:url" content="http://0.0.0.0:4000/blog/2025/03/26/iops-cluster-sizes-filesystems/">
+    <meta property="twitter:title" content="Why IOPS, Cluster Sizes, and Filesystems Matter in Kubernetes">
+    <meta property="twitter:description" content="Deep dive into storage performance considerations for Kubernetes workloads, including IOPS optimization, cluster sizing strategies, and filesystem selection ...">
     
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
@@ -811,24 +809,14 @@
 </head>
 <body>
     <!-- Header -->
-    {% unless page.layout == 'post' %}
-    <header class="header">
-        <div class="container">
-            <div class="header-content">
-                <h1>{{ site.author.name }}</h1>
-                <p class="subtitle">DevOps Engineer & Cloud Architect</p>
-                <p class="tagline">{{ site.description }}</p>
-            </div>
-        </div>
-    </header>
-    {% endunless %}
+    
 
     <!-- Navigation -->
     <nav class="nav">
         <div class="container">
             <div class="nav-container">
-                <a href="/" {% if page.url == "/" %}class="active"{% endif %}><i class="bi bi-house"></i> Home</a>
-                <a href="/blog/" {% if page.url contains "/blog" %}class="active"{% endif %}><i class="bi bi-journal-text"></i> Blog</a>
+                <a href="/" ><i class="bi bi-house"></i> Home</a>
+                <a href="/blog/" class="active"><i class="bi bi-journal-text"></i> Blog</a>
                 <a href="/#about"><i class="bi bi-person"></i> About</a>
                 <a href="/#expertise"><i class="bi bi-gear"></i> Expertise</a>
                 <a href="/#projects"><i class="bi bi-code-slash"></i> Projects</a>
@@ -840,14 +828,413 @@
     <!-- Main Content -->
     <main class="main">
         <div class="container">
-            {{ content }}
+            <article class="article-content">
+    <header class="mb-4">
+        <div class="blog-post-meta">
+            <i class="bi bi-calendar"></i> March 26, 2025
+             • <i class="bi bi-person"></i> Niels Weistra
+             • <i class="bi bi-folder"></i> kubernetes, storage, performance
+        </div>
+        <h1>Why IOPS, Cluster Sizes, and Filesystems Matter in Kubernetes</h1>
+        
+        <p class="lead">Deep dive into storage performance considerations for Kubernetes workloads, including IOPS optimization, cluster sizing strategies, and filesystem selection for optimal performance.</p>
+        
+    </header>
+
+    <div class="content">
+        <h1 id="why-iops-cluster-sizes-and-filesystems-matter-in-kubernetes">Why IOPS, Cluster Sizes, and Filesystems Matter in Kubernetes</h1>
+
+<p>When designing Kubernetes clusters for production workloads, three critical factors often determine the success or failure of your deployment: <strong>IOPS (Input/Output Operations Per Second)</strong>, <strong>cluster sizing</strong>, and <strong>filesystem selection</strong>. These foundational elements directly impact application performance, scalability, and reliability.</p>
+
+<h2 id="understanding-iops-in-kubernetes-context">Understanding IOPS in Kubernetes Context</h2>
+
+<h3 id="what-are-iops">What Are IOPS?</h3>
+
+<p>IOPS measure how many read and write operations your storage system can handle per second. In Kubernetes environments, this translates to how quickly your pods can:</p>
+
+<ul>
+  <li>Start up and load container images</li>
+  <li>Read configuration files and secrets</li>
+  <li>Write logs and application data</li>
+  <li>Handle database operations</li>
+  <li>Process file-based workloads</li>
+</ul>
+
+<h3 id="iops-requirements-by-workload-type">IOPS Requirements by Workload Type</h3>
+
+<p>Different workloads have vastly different IOPS requirements:</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Example: Database workload requiring high IOPS</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">PersistentVolumeClaim</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">database-storage</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">accessModes</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="s">ReadWriteOnce</span>
+  <span class="na">resources</span><span class="pi">:</span>
+    <span class="na">requests</span><span class="pi">:</span>
+      <span class="na">storage</span><span class="pi">:</span> <span class="s">100Gi</span>
+  <span class="na">storageClassName</span><span class="pi">:</span> <span class="s">fast-ssd</span>
+  <span class="c1"># Annotations for cloud providers</span>
+  <span class="na">annotations</span><span class="pi">:</span>
+    <span class="na">volume.beta.kubernetes.io/storage-provisioned-iops</span><span class="pi">:</span> <span class="s2">"</span><span class="s">3000"</span>
+</code></pre></div></div>
+
+<p><strong>Workload Categories:</strong></p>
+
+<ul>
+  <li><strong>Databases</strong>: 1000-10000+ IOPS</li>
+  <li><strong>Log aggregation</strong>: 500-2000 IOPS</li>
+  <li><strong>Web applications</strong>: 100-500 IOPS</li>
+  <li><strong>Batch processing</strong>: 50-200 IOPS</li>
+  <li><strong>Static content</strong>: 10-50 IOPS</li>
+</ul>
+
+<h2 id="cluster-sizing-the-foundation-of-performance">Cluster Sizing: The Foundation of Performance</h2>
+
+<h3 id="node-sizing-strategies">Node Sizing Strategies</h3>
+
+<p>Cluster sizing isn’t just about CPU and memory—storage performance scales with your infrastructure choices:</p>
+
+<h4 id="small-clusters-1-10-nodes">Small Clusters (1-10 nodes)</h4>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Optimal for development and small production workloads</span>
+<span class="na">Node Specs</span><span class="pi">:</span>
+  <span class="na">CPU</span><span class="pi">:</span> <span class="s">4-8 cores</span>
+  <span class="na">Memory</span><span class="pi">:</span> <span class="s">16-32 GB</span>
+  <span class="na">Storage</span><span class="pi">:</span> <span class="s">100-500 GB SSD</span>
+  <span class="na">Network</span><span class="pi">:</span> <span class="s">1-10 Gbps</span>
+  <span class="na">Expected IOPS</span><span class="pi">:</span> <span class="s">1000-3000 per node</span>
+</code></pre></div></div>
+
+<h4 id="medium-clusters-10-50-nodes">Medium Clusters (10-50 nodes)</h4>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Production workloads with moderate scaling</span>
+<span class="na">Node Specs</span><span class="pi">:</span>
+  <span class="na">CPU</span><span class="pi">:</span> <span class="s">8-16 cores</span>
+  <span class="na">Memory</span><span class="pi">:</span> <span class="s">32-64 GB</span>
+  <span class="na">Storage</span><span class="pi">:</span> <span class="s">500-1000 GB SSD</span>
+  <span class="na">Network</span><span class="pi">:</span> <span class="s">10-25 Gbps</span>
+  <span class="na">Expected IOPS</span><span class="pi">:</span> <span class="s">3000-8000 per node</span>
+</code></pre></div></div>
+
+<h4 id="large-clusters-50-nodes">Large Clusters (50+ nodes)</h4>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># High-scale production environments</span>
+<span class="na">Node Specs</span><span class="pi">:</span>
+  <span class="na">CPU</span><span class="pi">:</span> <span class="s">16-32+ cores</span>
+  <span class="na">Memory</span><span class="pi">:</span> <span class="s">64-128+ GB</span>
+  <span class="na">Storage</span><span class="pi">:</span> <span class="s">1000+ GB NVMe SSD</span>
+  <span class="na">Network</span><span class="pi">:</span> <span class="s">25+ Gbps</span>
+  <span class="na">Expected IOPS</span><span class="pi">:</span> <span class="s">8000-20000+ per node</span>
+</code></pre></div></div>
+
+<h3 id="storage-distribution-patterns">Storage Distribution Patterns</h3>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Example: Distributing storage across availability zones</span>
+kubectl get nodes <span class="nt">-o</span> custom-columns<span class="o">=</span>NAME:.metadata.name,ZONE:.metadata.labels.<span class="s1">'topology\.kubernetes\.io/zone'</span>,STORAGE:.status.allocatable.ephemeral-storage
+</code></pre></div></div>
+
+<h2 id="filesystem-selection-the-hidden-performance-factor">Filesystem Selection: The Hidden Performance Factor</h2>
+
+<h3 id="filesystem-comparison-for-kubernetes">Filesystem Comparison for Kubernetes</h3>
+
+<table>
+  <thead>
+    <tr>
+      <th>Filesystem</th>
+      <th>Use Case</th>
+      <th>IOPS Performance</th>
+      <th>Pros</th>
+      <th>Cons</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>ext4</strong></td>
+      <td>General purpose</td>
+      <td>Good</td>
+      <td>Stable, widely supported</td>
+      <td>Limited scalability</td>
+    </tr>
+    <tr>
+      <td><strong>XFS</strong></td>
+      <td>Large files, databases</td>
+      <td>Excellent</td>
+      <td>High performance, scalable</td>
+      <td>Complex tuning</td>
+    </tr>
+    <tr>
+      <td><strong>Btrfs</strong></td>
+      <td>Advanced features</td>
+      <td>Good</td>
+      <td>Snapshots, compression</td>
+      <td>Less mature</td>
+    </tr>
+    <tr>
+      <td><strong>ZFS</strong></td>
+      <td>Enterprise storage</td>
+      <td>Excellent</td>
+      <td>Data integrity, features</td>
+      <td>Resource intensive</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="filesystem-tuning-for-kubernetes">Filesystem Tuning for Kubernetes</h3>
+
+<h4 id="xfs-optimization-example">XFS Optimization Example</h4>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Mount options for high-performance XFS in Kubernetes nodes</span>
+/dev/sdb1 /var/lib/kubelet xfs defaults,noatime,largeio,inode64,allocsize<span class="o">=</span>16m 0 2
+</code></pre></div></div>
+
+<h4 id="ext4-tuning">ext4 Tuning</h4>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># High-performance ext4 configuration</span>
+/dev/sdb1 /var/lib/kubelet ext4 defaults,noatime,data<span class="o">=</span>writeback,barrier<span class="o">=</span>0,nobh 0 2
+</code></pre></div></div>
+
+<h2 id="real-world-performance-impact">Real-World Performance Impact</h2>
+
+<h3 id="case-study-e-commerce-platform">Case Study: E-commerce Platform</h3>
+
+<p><strong>Before Optimization:</strong></p>
+<ul>
+  <li>20-node cluster with spinning disks</li>
+  <li>150 IOPS per node average</li>
+  <li>Pod startup time: 45-60 seconds</li>
+  <li>Database query latency: 500-1000ms</li>
+</ul>
+
+<p><strong>After Optimization:</strong></p>
+<ul>
+  <li>Same cluster with SSD + XFS + proper sizing</li>
+  <li>5000 IOPS per node average</li>
+  <li>Pod startup time: 5-10 seconds</li>
+  <li>Database query latency: 50-100ms</li>
+</ul>
+
+<h3 id="monitoring-iops-in-kubernetes">Monitoring IOPS in Kubernetes</h3>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># Prometheus monitoring for storage performance</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">monitoring.coreos.com/v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">ServiceMonitor</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">node-exporter-storage</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">selector</span><span class="pi">:</span>
+    <span class="na">matchLabels</span><span class="pi">:</span>
+      <span class="na">app</span><span class="pi">:</span> <span class="s">node-exporter</span>
+  <span class="na">endpoints</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="na">port</span><span class="pi">:</span> <span class="s">metrics</span>
+    <span class="na">path</span><span class="pi">:</span> <span class="s">/metrics</span>
+    <span class="na">interval</span><span class="pi">:</span> <span class="s">30s</span>
+</code></pre></div></div>
+
+<p>Key metrics to monitor:</p>
+
+<pre><code class="language-promql"># IOPS utilization
+rate(node_disk_reads_completed_total[5m]) + rate(node_disk_writes_completed_total[5m])
+
+# Disk latency
+rate(node_disk_read_time_seconds_total[5m]) / rate(node_disk_reads_completed_total[5m])
+
+# Queue depth
+node_disk_io_now
+</code></pre>
+
+<h2 id="best-practices-for-production">Best Practices for Production</h2>
+
+<h3 id="1-storage-class-design">1. Storage Class Design</h3>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">storage.k8s.io/v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">StorageClass</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">high-iops-ssd</span>
+<span class="na">provisioner</span><span class="pi">:</span> <span class="s">kubernetes.io/aws-ebs</span>
+<span class="na">parameters</span><span class="pi">:</span>
+  <span class="na">type</span><span class="pi">:</span> <span class="s">io2</span>
+  <span class="na">iops</span><span class="pi">:</span> <span class="s2">"</span><span class="s">3000"</span>
+  <span class="na">fsType</span><span class="pi">:</span> <span class="s">xfs</span>
+  <span class="na">reclaimPolicy</span><span class="pi">:</span> <span class="s">Retain</span>
+<span class="na">allowVolumeExpansion</span><span class="pi">:</span> <span class="no">true</span>
+<span class="na">volumeBindingMode</span><span class="pi">:</span> <span class="s">WaitForFirstConsumer</span>
+</code></pre></div></div>
+
+<h3 id="2-resource-limits-and-requests">2. Resource Limits and Requests</h3>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">Pod</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">containers</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">database</span>
+    <span class="na">resources</span><span class="pi">:</span>
+      <span class="na">requests</span><span class="pi">:</span>
+        <span class="na">memory</span><span class="pi">:</span> <span class="s2">"</span><span class="s">2Gi"</span>
+        <span class="na">cpu</span><span class="pi">:</span> <span class="s2">"</span><span class="s">500m"</span>
+        <span class="na">ephemeral-storage</span><span class="pi">:</span> <span class="s2">"</span><span class="s">10Gi"</span>
+      <span class="na">limits</span><span class="pi">:</span>
+        <span class="na">memory</span><span class="pi">:</span> <span class="s2">"</span><span class="s">4Gi"</span>
+        <span class="na">cpu</span><span class="pi">:</span> <span class="s2">"</span><span class="s">1000m"</span>
+        <span class="na">ephemeral-storage</span><span class="pi">:</span> <span class="s2">"</span><span class="s">20Gi"</span>
+</code></pre></div></div>
+
+<h3 id="3-node-affinity-for-storage">3. Node Affinity for Storage</h3>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">apps/v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">Deployment</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">template</span><span class="pi">:</span>
+    <span class="na">spec</span><span class="pi">:</span>
+      <span class="na">affinity</span><span class="pi">:</span>
+        <span class="na">nodeAffinity</span><span class="pi">:</span>
+          <span class="na">requiredDuringSchedulingIgnoredDuringExecution</span><span class="pi">:</span>
+            <span class="na">nodeSelectorTerms</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="na">matchExpressions</span><span class="pi">:</span>
+              <span class="pi">-</span> <span class="na">key</span><span class="pi">:</span> <span class="s">node.kubernetes.io/instance-type</span>
+                <span class="na">operator</span><span class="pi">:</span> <span class="s">In</span>
+                <span class="na">values</span><span class="pi">:</span> <span class="pi">[</span><span class="s2">"</span><span class="s">i3.xlarge"</span><span class="pi">,</span> <span class="s2">"</span><span class="s">i3.2xlarge"</span><span class="pi">]</span>  <span class="c1"># NVMe instances</span>
+</code></pre></div></div>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>The intersection of IOPS, cluster sizing, and filesystem selection creates a performance triangle that determines your Kubernetes cluster’s capabilities. Ignoring any one of these factors can create bottlenecks that no amount of CPU or memory can overcome.</p>
+
+<p><strong>Key Takeaways:</strong></p>
+
+<ol>
+  <li><strong>Match IOPS to workload requirements</strong> - Don’t over-provision, but ensure sufficient headroom</li>
+  <li><strong>Size clusters based on storage patterns</strong> - Consider both compute and storage scaling together</li>
+  <li><strong>Choose filesystems deliberately</strong> - XFS for high-performance, ext4 for stability</li>
+  <li><strong>Monitor continuously</strong> - Storage performance degrades over time without proper monitoring</li>
+  <li><strong>Test under load</strong> - Storage performance characteristics change dramatically under pressure</li>
+</ol>
+
+<p>By treating storage as a first-class citizen in your Kubernetes architecture decisions, you’ll build more resilient, performant, and cost-effective clusters.</p>
+
+<hr />
+
+<p><em>Want to discuss storage optimization strategies for your Kubernetes infrastructure? Connect with me on <a href="https://linkedin.com/in/nielswei">LinkedIn</a> or check out more articles on cloud-native architecture.</em></p>
+
+    </div>
+
+    
+    <div class="blog-post-tags">
+        <strong>Tags:</strong>
+        
+        <span class="tag"># IOPS</span>
+        
+        <span class="tag"># filesystems</span>
+        
+        <span class="tag"># cluster-sizing</span>
+        
+        <span class="tag"># storage</span>
+        
+        <span class="tag"># kubernetes</span>
+        
+        <span class="tag"># performance-optimization</span>
+        
+    </div>
+    
+
+    <div class="mt-5 pt-4" style="border-top: 1px solid #e9ecef;">
+        <div class="row">
+            <div class="col-md-6">
+                <h6>Share this post:</h6>
+                <div class="social-links" style="justify-content: flex-start; margin-top: 1rem;">
+                    <a href="https://twitter.com/intent/tweet?url=http://0.0.0.0:4000/blog/2025/03/26/iops-cluster-sizes-filesystems/&text=Why IOPS, Cluster Sizes, and Filesystems Matter in Kubernetes" 
+                       target="_blank" class="social-link" title="Share on Twitter">
+                        <i class="bi bi-twitter-x"></i>
+                    </a>
+                    <a href="https://www.linkedin.com/sharing/share-offsite/?url=http://0.0.0.0:4000/blog/2025/03/26/iops-cluster-sizes-filesystems/" 
+                       target="_blank" class="social-link" title="Share on LinkedIn">
+                        <i class="bi bi-linkedin"></i>
+                    </a>
+                    <a href="mailto:?subject=Why IOPS, Cluster Sizes, and Filesystems Matter in Kubernetes&body=Check out this post: http://0.0.0.0:4000/blog/2025/03/26/iops-cluster-sizes-filesystems/" 
+                       class="social-link" title="Share via Email">
+                        <i class="bi bi-envelope"></i>
+                    </a>
+                </div>
+            </div>
+            <div class="col-md-6 text-md-end">
+                <a href="/blog/" class="btn btn-outline-primary">
+                    <i class="bi bi-arrow-left"></i> Back to Blog
+                </a>
+            </div>
+        </div>
+    </div>
+</article>
+
+<style>
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--primary-color);
+    border-radius: 6px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.btn-outline-primary {
+    color: var(--primary-color);
+    background: transparent;
+}
+
+.btn-outline-primary:hover {
+    background: var(--primary-color);
+    color: white;
+}
+
+.lead {
+    font-size: 1.2rem;
+    color: var(--medium-gray);
+    font-weight: 300;
+}
+
+.mb-4 {
+    margin-bottom: 2rem;
+}
+
+.mt-5 {
+    margin-top: 3rem;
+}
+
+.pt-4 {
+    padding-top: 2rem;
+}
+
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 -15px;
+}
+
+.col-md-6 {
+    flex: 0 0 50%;
+    max-width: 50%;
+    padding: 0 15px;
+}
+
+.text-md-end {
+    text-align: right;
+}
+
+@media (max-width: 768px) {
+    .col-md-6 {
+        flex: 0 0 100%;
+        max-width: 100%;
+        margin-bottom: 1rem;
+    }
+    
+    .text-md-end {
+        text-align: left;
+    }
+}
+</style>
         </div>
     </main>
 
     <!-- Footer -->
     <footer class="footer">
         <div class="container">
-            <p>&copy; 2025 {{ site.author.name }}. Building the future, one deployment at a time.</p>
+            <p>&copy; 2025 Niels Weistra. Building the future, one deployment at a time.</p>
         </div>
     </footer>
 

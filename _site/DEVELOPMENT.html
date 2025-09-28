@@ -4,27 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    {% if page.title %}
-        <title>{{ page.title }} | {{ site.title }}</title>
-    {% else %}
-        <title>{{ site.title }}</title>
-    {% endif %}
     
-    <meta name="description" content="{% if page.excerpt %}{{ page.excerpt | strip_html | strip_newlines | truncate: 160 }}{% else %}{{ site.description }}{% endif %}">
+        <title>Development Guide | Niels Weistra - DevOps Engineer & Cloud Architect</title>
+    
+    
+    <meta name="description" content="Expert DevOps Engineer and Cloud Architect specializing in Kubernetes, Azure, GitOps, and cloud-native solutions. Founder of ITlusions.">
     <meta name="keywords" content="Niels Weistra, DevOps, Cloud Architecture, Kubernetes, Azure, GitOps, ITlusions, Cloud-Native, DevSecOps">
-    <meta name="author" content="{{ site.author.name }}">
+    <meta name="author" content="Niels Weistra">
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="{{ site.url }}{{ page.url }}">
-    <meta property="og:title" content="{% if page.title %}{{ page.title }}{% else %}{{ site.title }}{% endif %}">
-    <meta property="og:description" content="{% if page.excerpt %}{{ page.excerpt | strip_html | strip_newlines | truncate: 160 }}{% else %}{{ site.description }}{% endif %}">
+    <meta property="og:url" content="http://0.0.0.0:4000/DEVELOPMENT.html">
+    <meta property="og:title" content="Development Guide">
+    <meta property="og:description" content="Expert DevOps Engineer and Cloud Architect specializing in Kubernetes, Azure, GitOps, and cloud-native solutions. Founder of ITlusions.">
     
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="{{ site.url }}{{ page.url }}">
-    <meta property="twitter:title" content="{% if page.title %}{{ page.title }}{% else %}{{ site.title }}{% endif %}">
-    <meta property="twitter:description" content="{% if page.excerpt %}{{ page.excerpt | strip_html | strip_newlines | truncate: 160 }}{% else %}{{ site.description }}{% endif %}">
+    <meta property="twitter:url" content="http://0.0.0.0:4000/DEVELOPMENT.html">
+    <meta property="twitter:title" content="Development Guide">
+    <meta property="twitter:description" content="Expert DevOps Engineer and Cloud Architect specializing in Kubernetes, Azure, GitOps, and cloud-native solutions. Founder of ITlusions.">
     
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
@@ -811,24 +809,24 @@
 </head>
 <body>
     <!-- Header -->
-    {% unless page.layout == 'post' %}
+    
     <header class="header">
         <div class="container">
             <div class="header-content">
-                <h1>{{ site.author.name }}</h1>
+                <h1>Niels Weistra</h1>
                 <p class="subtitle">DevOps Engineer & Cloud Architect</p>
-                <p class="tagline">{{ site.description }}</p>
+                <p class="tagline">Expert DevOps Engineer and Cloud Architect specializing in Kubernetes, Azure, GitOps, and cloud-native solutions. Founder of ITlusions.</p>
             </div>
         </div>
     </header>
-    {% endunless %}
+    
 
     <!-- Navigation -->
     <nav class="nav">
         <div class="container">
             <div class="nav-container">
-                <a href="/" {% if page.url == "/" %}class="active"{% endif %}><i class="bi bi-house"></i> Home</a>
-                <a href="/blog/" {% if page.url contains "/blog" %}class="active"{% endif %}><i class="bi bi-journal-text"></i> Blog</a>
+                <a href="/" ><i class="bi bi-house"></i> Home</a>
+                <a href="/blog/" ><i class="bi bi-journal-text"></i> Blog</a>
                 <a href="/#about"><i class="bi bi-person"></i> About</a>
                 <a href="/#expertise"><i class="bi bi-gear"></i> Expertise</a>
                 <a href="/#projects"><i class="bi bi-code-slash"></i> Projects</a>
@@ -840,14 +838,233 @@
     <!-- Main Content -->
     <main class="main">
         <div class="container">
-            {{ content }}
+            <h1 id="development-guide">Development Guide</h1>
+
+<h2 id="-docker-development-setup">🐳 Docker Development Setup</h2>
+
+<p>This guide will help you get your Jekyll site running locally using Docker.</p>
+
+<h3 id="quick-start">Quick Start</h3>
+
+<ol>
+  <li><strong>Clone and navigate to the repository</strong>
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git clone https://github.com/nielsweistra/nielsweistra.github.io.git
+<span class="nb">cd </span>nielsweistra.github.io
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p><strong>Start the development server</strong></p>
+
+    <p><strong>Windows:</strong></p>
+    <pre><code class="language-cmd">start-dev.bat
+</code></pre>
+
+    <p><strong>Linux/macOS:</strong></p>
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">chmod</span> +x start-dev.sh
+./start-dev.sh
+</code></pre></div>    </div>
+  </li>
+  <li><strong>Open your browser</strong>
+    <ul>
+      <li>Navigate to <a href="http://localhost:4000">http://localhost:4000</a></li>
+      <li>The site will automatically reload when you make changes</li>
+    </ul>
+  </li>
+</ol>
+
+<h3 id="docker-commands-reference">Docker Commands Reference</h3>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Build and start (with logs)</span>
+docker-compose up <span class="nt">--build</span>
+
+<span class="c"># Start in background</span>
+docker-compose up <span class="nt">-d</span>
+
+<span class="c"># Stop the containers</span>
+docker-compose down
+
+<span class="c"># View logs</span>
+docker-compose logs <span class="nt">-f</span>
+
+<span class="c"># Rebuild from scratch</span>
+docker-compose down
+docker-compose up <span class="nt">--build</span> <span class="nt">--force-recreate</span>
+</code></pre></div></div>
+
+<h3 id="development-workflow">Development Workflow</h3>
+
+<ol>
+  <li><strong>Make changes</strong> to your files (HTML, CSS, Markdown)</li>
+  <li><strong>Save the files</strong> - changes are automatically detected</li>
+  <li><strong>Browser refreshes automatically</strong> via LiveReload</li>
+  <li><strong>No manual restart needed</strong> for most changes</li>
+</ol>
+
+<h3 id="troubleshooting">Troubleshooting</h3>
+
+<h4 id="port-already-in-use">Port Already in Use</h4>
+<p>If port 4000 is already in use:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Find what's using port 4000</span>
+netstat <span class="nt">-ano</span> | findstr :4000
+
+<span class="c"># Kill the process (Windows)</span>
+taskkill /PID &lt;PID&gt; /F
+
+<span class="c"># Or use different ports in docker-compose.yml</span>
+ports:
+  - <span class="s2">"4001:4000"</span>  <span class="c"># Change 4001 to any available port</span>
+</code></pre></div></div>
+
+<h4 id="container-wont-start">Container Won’t Start</h4>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Clean up and restart</span>
+docker-compose down
+docker system prune <span class="nt">-f</span>
+docker-compose up <span class="nt">--build</span>
+</code></pre></div></div>
+
+<h4 id="permission-issues-linuxmacos">Permission Issues (Linux/macOS)</h4>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Fix ownership of generated files</span>
+<span class="nb">sudo chown</span> <span class="nt">-R</span> <span class="nv">$USER</span>:<span class="nv">$USER</span> _site .sass-cache .jekyll-cache
+</code></pre></div></div>
+
+<h3 id="file-structure">File Structure</h3>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>├── Dockerfile              # Docker image configuration
+├── docker-compose.yml      # Docker Compose services
+├── .dockerignore           # Files to exclude from Docker build
+├── start-dev.sh            # Development startup script (Linux/macOS)
+├── start-dev.bat           # Development startup script (Windows)
+└── DEVELOPMENT.md          # This file
+</code></pre></div></div>
+
+<h3 id="environment-variables">Environment Variables</h3>
+
+<p>You can customize the Jekyll environment by editing <code class="language-plaintext highlighter-rouge">docker-compose.yml</code>:</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">environment</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="s">JEKYLL_ENV=development</span>    <span class="c1"># development, production</span>
+  <span class="pi">-</span> <span class="s">BUNDLE_PATH=/usr/local/bundle</span>
+</code></pre></div></div>
+
+<h3 id="performance-tips">Performance Tips</h3>
+
+<ol>
+  <li><strong>Use volume caching</strong> - The Docker Compose file includes bundle caching</li>
+  <li><strong>Exclude unnecessary files</strong> - Update <code class="language-plaintext highlighter-rouge">.dockerignore</code> if needed</li>
+  <li><strong>Use polling</strong> - Force polling is enabled for better file change detection</li>
+</ol>
+
+<h3 id="production-build">Production Build</h3>
+
+<p>To build for production:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Build production version</span>
+docker-compose <span class="nb">exec </span>jekyll bundle <span class="nb">exec </span>jekyll build <span class="nt">--env</span><span class="o">=</span>production
+
+<span class="c"># Or build a production Docker image</span>
+docker build <span class="nt">-t</span> nielsweistra-site:production <span class="nt">--build-arg</span> <span class="nv">JEKYLL_ENV</span><span class="o">=</span>production <span class="nb">.</span>
+</code></pre></div></div>
+
+<h2 id="-deployment">🚀 Deployment</h2>
+
+<p>The site automatically deploys to GitHub Pages when you push to the <code class="language-plaintext highlighter-rouge">main</code> branch. No additional deployment steps are needed.</p>
+
+<h3 id="manual-github-pages-deployment">Manual GitHub Pages Deployment</h3>
+
+<p>If you need to trigger a manual deployment:</p>
+
+<ol>
+  <li>Go to your GitHub repository</li>
+  <li>Navigate to <strong>Actions</strong> tab</li>
+  <li>Find the <strong>Jekyll</strong> workflow</li>
+  <li>Click <strong>Run workflow</strong> button</li>
+</ol>
+
+<h2 id="-content-updates">📝 Content Updates</h2>
+
+<h3 id="adding-blog-posts">Adding Blog Posts</h3>
+
+<ol>
+  <li>Create a new file in <code class="language-plaintext highlighter-rouge">_posts/</code> with the format: <code class="language-plaintext highlighter-rouge">YYYY-MM-DD-title.md</code></li>
+  <li>Add front matter:
+    <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nn">---</span>
+<span class="na">layout</span><span class="pi">:</span> <span class="s">post</span>
+<span class="na">title</span><span class="pi">:</span> <span class="s2">"</span><span class="s">Your</span><span class="nv"> </span><span class="s">Post</span><span class="nv"> </span><span class="s">Title"</span>
+<span class="na">date</span><span class="pi">:</span> <span class="s">2025-09-28</span>
+<span class="na">categories</span><span class="pi">:</span> <span class="pi">[</span><span class="nv">devops</span><span class="pi">,</span> <span class="nv">kubernetes</span><span class="pi">]</span>
+<span class="na">tags</span><span class="pi">:</span> <span class="pi">[</span><span class="nv">docker</span><span class="pi">,</span> <span class="nv">azure</span><span class="pi">,</span> <span class="nv">ci-cd</span><span class="pi">]</span>
+<span class="nn">---</span>
+</code></pre></div>    </div>
+  </li>
+  <li>Write your content in Markdown</li>
+  <li>Save and the site will automatically update</li>
+</ol>
+
+<h3 id="updating-skills-matrix">Updating Skills Matrix</h3>
+
+<p>Edit the skills section in <code class="language-plaintext highlighter-rouge">index.html</code>:</p>
+<ul>
+  <li>Update skill names, experience years, and proficiency levels</li>
+  <li>Modify progress bar values (<code class="language-plaintext highlighter-rouge">data-width</code> attribute)</li>
+  <li>Add or remove skill categories as needed</li>
+</ul>
+
+<h3 id="customizing-design">Customizing Design</h3>
+
+<ul>
+  <li><strong>Colors</strong>: Update CSS custom properties in <code class="language-plaintext highlighter-rouge">_layouts/default.html</code></li>
+  <li><strong>Fonts</strong>: Modify the Google Fonts import in the <code class="language-plaintext highlighter-rouge">&lt;head&gt;</code> section</li>
+  <li><strong>Layout</strong>: Adjust the grid and flexbox layouts in the CSS</li>
+</ul>
+
+<h2 id="-debugging">🔍 Debugging</h2>
+
+<h3 id="jekyll-build-issues">Jekyll Build Issues</h3>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Check Jekyll version and dependencies</span>
+docker-compose <span class="nb">exec </span>jekyll bundle <span class="nb">exec </span>jekyll <span class="nt">--version</span>
+docker-compose <span class="nb">exec </span>jekyll bundle list
+
+<span class="c"># Verbose build output</span>
+docker-compose <span class="nb">exec </span>jekyll bundle <span class="nb">exec </span>jekyll build <span class="nt">--verbose</span>
+</code></pre></div></div>
+
+<h3 id="checking-logs">Checking Logs</h3>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Real-time logs</span>
+docker-compose logs <span class="nt">-f</span> jekyll
+
+<span class="c"># Specific container logs</span>
+docker logs nielsweistra-github-io
+</code></pre></div></div>
+
+<h3 id="common-issues">Common Issues</h3>
+
+<ol>
+  <li><strong>Gemfile.lock conflicts</strong>: Delete <code class="language-plaintext highlighter-rouge">Gemfile.lock</code> and rebuild</li>
+  <li><strong>Cache issues</strong>: Clear Jekyll cache: <code class="language-plaintext highlighter-rouge">rm -rf .jekyll-cache _site .sass-cache</code></li>
+  <li><strong>Live reload not working</strong>: Check that port 35729 is accessible</li>
+</ol>
+
+<h2 id="-support">📞 Support</h2>
+
+<p>If you encounter issues:</p>
+
+<ol>
+  <li>Check this development guide</li>
+  <li>Review the <a href="https://jekyllrb.com/docs/">Jekyll documentation</a></li>
+  <li>Check <a href="https://docs.github.com/en/pages">GitHub Pages documentation</a></li>
+  <li>Open an issue in the repository</li>
+</ol>
+
         </div>
     </main>
 
     <!-- Footer -->
     <footer class="footer">
         <div class="container">
-            <p>&copy; 2025 {{ site.author.name }}. Building the future, one deployment at a time.</p>
+            <p>&copy; 2025 Niels Weistra. Building the future, one deployment at a time.</p>
         </div>
     </footer>
 

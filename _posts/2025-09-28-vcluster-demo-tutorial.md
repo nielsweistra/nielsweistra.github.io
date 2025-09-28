@@ -139,6 +139,7 @@ Create the core CAPI resource template:
 
 ```yaml
 # templates/vcluster.yaml
+{% raw %}
 {{- if .Values.vcluster.enabled }}
 apiVersion: infrastructure.cluster.x-k8s.io/v1alpha1
 kind: VCluster
@@ -210,6 +211,7 @@ spec:
   {{- end }}
 
 {{- end }}
+{% endraw %}
 ```
 
 ## Step 4: Production Values Configuration
@@ -251,7 +253,9 @@ vcluster:
   # Syncer configuration
   syncer:
     extraArgs:
+      {% raw %}
       - --out-kube-config-server=https://demo.{{ .Values.global.domain }}
+      {% endraw %}
     resources:
       limits:
         memory: "1Gi"

@@ -4,27 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    {% if page.title %}
-        <title>{{ page.title }} | {{ site.title }}</title>
-    {% else %}
-        <title>{{ site.title }}</title>
-    {% endif %}
     
-    <meta name="description" content="{% if page.excerpt %}{{ page.excerpt | strip_html | strip_newlines | truncate: 160 }}{% else %}{{ site.description }}{% endif %}">
+        <title>Blog | Niels Weistra - DevOps Engineer & Cloud Architect</title>
+    
+    
+    <meta name="description" content="Expert DevOps Engineer and Cloud Architect specializing in Kubernetes, Azure, GitOps, and cloud-native solutions. Founder of ITlusions.">
     <meta name="keywords" content="Niels Weistra, DevOps, Cloud Architecture, Kubernetes, Azure, GitOps, ITlusions, Cloud-Native, DevSecOps">
-    <meta name="author" content="{{ site.author.name }}">
+    <meta name="author" content="Niels Weistra">
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="{{ site.url }}{{ page.url }}">
-    <meta property="og:title" content="{% if page.title %}{{ page.title }}{% else %}{{ site.title }}{% endif %}">
-    <meta property="og:description" content="{% if page.excerpt %}{{ page.excerpt | strip_html | strip_newlines | truncate: 160 }}{% else %}{{ site.description }}{% endif %}">
+    <meta property="og:url" content="http://0.0.0.0:4000/blog/">
+    <meta property="og:title" content="Blog">
+    <meta property="og:description" content="Expert DevOps Engineer and Cloud Architect specializing in Kubernetes, Azure, GitOps, and cloud-native solutions. Founder of ITlusions.">
     
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="{{ site.url }}{{ page.url }}">
-    <meta property="twitter:title" content="{% if page.title %}{{ page.title }}{% else %}{{ site.title }}{% endif %}">
-    <meta property="twitter:description" content="{% if page.excerpt %}{{ page.excerpt | strip_html | strip_newlines | truncate: 160 }}{% else %}{{ site.description }}{% endif %}">
+    <meta property="twitter:url" content="http://0.0.0.0:4000/blog/">
+    <meta property="twitter:title" content="Blog">
+    <meta property="twitter:description" content="Expert DevOps Engineer and Cloud Architect specializing in Kubernetes, Azure, GitOps, and cloud-native solutions. Founder of ITlusions.">
     
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
@@ -811,24 +809,24 @@
 </head>
 <body>
     <!-- Header -->
-    {% unless page.layout == 'post' %}
+    
     <header class="header">
         <div class="container">
             <div class="header-content">
-                <h1>{{ site.author.name }}</h1>
+                <h1>Niels Weistra</h1>
                 <p class="subtitle">DevOps Engineer & Cloud Architect</p>
-                <p class="tagline">{{ site.description }}</p>
+                <p class="tagline">Expert DevOps Engineer and Cloud Architect specializing in Kubernetes, Azure, GitOps, and cloud-native solutions. Founder of ITlusions.</p>
             </div>
         </div>
     </header>
-    {% endunless %}
+    
 
     <!-- Navigation -->
     <nav class="nav">
         <div class="container">
             <div class="nav-container">
-                <a href="/" {% if page.url == "/" %}class="active"{% endif %}><i class="bi bi-house"></i> Home</a>
-                <a href="/blog/" {% if page.url contains "/blog" %}class="active"{% endif %}><i class="bi bi-journal-text"></i> Blog</a>
+                <a href="/" ><i class="bi bi-house"></i> Home</a>
+                <a href="/blog/" class="active"><i class="bi bi-journal-text"></i> Blog</a>
                 <a href="/#about"><i class="bi bi-person"></i> About</a>
                 <a href="/#expertise"><i class="bi bi-gear"></i> Expertise</a>
                 <a href="/#projects"><i class="bi bi-code-slash"></i> Projects</a>
@@ -840,14 +838,102 @@
     <!-- Main Content -->
     <main class="main">
         <div class="container">
-            {{ content }}
+            <section class="section">
+    <h2>Technical Blog</h2>
+    <p>Insights, tutorials, and thoughts on cloud-native technologies, DevOps practices, and digital transformation.</p>
+</section>
+
+<div class="blog-posts">
+    
+    <div class="blog-post-card">
+        <div class="blog-post-meta">
+            <i class="bi bi-calendar"></i> September 28, 2025
+             • <i class="bi bi-person"></i> Niels Weistra
+             • <i class="bi bi-folder"></i> kubernetes, vcluster, cluster-api, helm
+        </div>
+        <h3 class="blog-post-title">
+            <a href="/blog/2025/09/28/vcluster-demo-tutorial/">Building vCluster Demos with Helm and Cluster API: Enterprise-Grade Virtual Clusters</a>
+        </h3>
+        <div class="blog-post-excerpt">
+            Learn how to deploy vCluster demos using Helm charts and the Cluster API provider. This enterprise-focused guide demonstrates how to create production-ready virtual Kubernetes clusters with GitOps workflows and proper resource management.
+        </div>
+        
+        <div class="blog-post-tags">
+            
+            <span class="tag"># vcluster</span>
+            
+            <span class="tag"># kubernetes</span>
+            
+            <span class="tag"># cluster-api</span>
+            
+            <span class="tag"># capi</span>
+            
+            <span class="tag"># helm</span>
+            
+            <span class="tag"># virtual-clusters</span>
+            
+            <span class="tag"># enterprise</span>
+            
+            <span class="tag"># multi-tenancy</span>
+            
+        </div>
+        
+        <div style="margin-top: 1.5rem;">
+            <a href="/blog/2025/09/28/vcluster-demo-tutorial/" class="card-link">
+                Read more <i class="bi bi-arrow-right"></i>
+            </a>
+        </div>
+    </div>
+    
+    <div class="blog-post-card">
+        <div class="blog-post-meta">
+            <i class="bi bi-calendar"></i> March 26, 2025
+             • <i class="bi bi-person"></i> Niels Weistra
+             • <i class="bi bi-folder"></i> kubernetes, storage, performance
+        </div>
+        <h3 class="blog-post-title">
+            <a href="/blog/2025/03/26/iops-cluster-sizes-filesystems/">Why IOPS, Cluster Sizes, and Filesystems Matter in Kubernetes</a>
+        </h3>
+        <div class="blog-post-excerpt">
+            Deep dive into storage performance considerations for Kubernetes workloads, including IOPS optimization, cluster sizing strategies, and filesystem selection for optimal performance.
+        </div>
+        
+        <div class="blog-post-tags">
+            
+            <span class="tag"># IOPS</span>
+            
+            <span class="tag"># filesystems</span>
+            
+            <span class="tag"># cluster-sizing</span>
+            
+            <span class="tag"># storage</span>
+            
+            <span class="tag"># kubernetes</span>
+            
+            <span class="tag"># performance-optimization</span>
+            
+        </div>
+        
+        <div style="margin-top: 1.5rem;">
+            <a href="/blog/2025/03/26/iops-cluster-sizes-filesystems/" class="card-link">
+                Read more <i class="bi bi-arrow-right"></i>
+            </a>
+        </div>
+    </div>
+    
+</div>
+
+
+
+<!-- Pagination -->
+
         </div>
     </main>
 
     <!-- Footer -->
     <footer class="footer">
         <div class="container">
-            <p>&copy; 2025 {{ site.author.name }}. Building the future, one deployment at a time.</p>
+            <p>&copy; 2025 Niels Weistra. Building the future, one deployment at a time.</p>
         </div>
     </footer>
 

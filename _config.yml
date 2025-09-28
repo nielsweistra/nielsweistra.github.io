@@ -1,0 +1,55 @@
+# Site settings
+title: "Niels Weistra - DevOps Engineer & Cloud Architect"
+email: "contact@itlusions.com"
+description: "Expert DevOps Engineer and Cloud Architect specializing in Kubernetes, Azure, GitOps, and cloud-native solutions. Founder of ITlusions."
+baseurl: ""
+url: "https://nielsweistra.github.io"
+
+# Author
+author:
+  name: "Niels Weistra"
+  email: "contact@itlusions.com"
+  linkedin: "https://linkedin.com/in/nielsweistra"
+  github: "https://github.com/nielsweistra"
+  twitter: "https://twitter.com/nielsweistra"
+  company: "https://itlusions.com"
+
+# Build settings
+markdown: kramdown
+highlighter: rouge
+paginate: 6
+paginate_path: "/blog/page:num/"
+theme: minima
+
+# Collections
+collections:
+  posts:
+    output: true
+    permalink: /blog/:year/:month/:day/:title/
+
+# Plugins
+plugins:
+  - jekyll-paginate
+  - jekyll-sitemap
+  - jekyll-seo-tag
+  - jekyll-feed
+
+# Exclude from processing
+exclude:
+  - README.md
+  - Gemfile
+  - Gemfile.lock
+  - vendor/
+
+# Defaults
+defaults:
+  - scope:
+      path: ""
+      type: "posts"
+    values:
+      layout: "post"
+      author: "Niels Weistra"
+  - scope:
+      path: ""
+    values:
+      layout: "default"

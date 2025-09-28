@@ -1,6 +1,6 @@
 # Site settings
 title: "Niels Weistra - DevOps Engineer & Cloud Architect"
-email: "contact@itlusions.com"
+email: "n.weistra@itlusions.com"
 description: "Expert DevOps Engineer and Cloud Architect specializing in Kubernetes, Azure, GitOps, and cloud-native solutions. Founder of ITlusions."
 baseurl: ""
 url: "https://nielsweistra.github.io"
@@ -8,10 +8,9 @@ url: "https://nielsweistra.github.io"
 # Author
 author:
   name: "Niels Weistra"
-  email: "contact@itlusions.com"
-  linkedin: "https://linkedin.com/in/nielsweistra"
+  email: "n.weistra@itlusions.com"
+  linkedin: "https://linkedin.com/in/nielswei"
   github: "https://github.com/nielsweistra"
-  twitter: "https://twitter.com/nielsweistra"
   company: "https://itlusions.com"
 
 # Build settings

@@ -1,50 +1,47 @@
 ---
 layout: post
-title: "Building vCluster Demos: Complete Guide to Virtual Kubernetes Clusters"
+title: "Building vCluster Demos with Helm Charts and Cluster API: Enterprise-Grade Virtual Clusters"
 date: 2025-09-28
-categories: [kubernetes, vcluster, helm]
-tags: [vcluster, kubernetes, helm, virtual-clusters, enterprise, multi-tenancy]
+categories: [kubernetes, vcluster, cluster-api, helm]
+tags: [vcluster, kubernetes, cluster-api, capi, helm, virtual-clusters, enterprise, multi-tenancy]
 author: "Niels Weistra"
-excerpt: "Learn how to deploy and manage vCluster demos using modern best practices. This comprehensive guide demonstrates how to create production-ready virtual Kubernetes clusters with Helm charts, proper resource management, and GitOps workflows."
+excerpt: "Learn how to deploy and manage vCluster demos using Helm charts and Cluster API provider. This enterprise-focused guide demonstrates how to create production-ready virtual Kubernetes clusters with GitOps workflows and proper resource management."
 ---
 
-# Building vCluster Demos: Complete Guide to Virtual Kubernetes Clusters
+# Building vCluster Demos with Helm Charts and Cluster API: Enterprise-Grade Virtual Clusters
 
-Virtual clusters (vClusters) are lightweight, fully functional Kubernetes clusters that run inside namespaces of host clusters. They provide perfect isolation for development, testing, and multi-tenancy scenarios while sharing the underlying infrastructure efficiently. In this guide, I'll show you how to build a comprehensive vCluster demo using modern best practices.
+Virtual clusters (vClusters) deployed through Helm charts and Cluster API represent the enterprise approach to Kubernetes multi-tenancy. This method provides GitOps compatibility, declarative management, and integration with existing CAPI infrastructure. In this guide, I'll show you how to build a professional vCluster demo using Helm charts and the Cluster API vCluster provider.
 
-## What is vCluster?
+## What is vCluster with Cluster API?
 
-vCluster creates fully functional virtual Kubernetes clusters that run inside regular Kubernetes namespaces. Each vCluster has its own:
+The vCluster Cluster API provider enables declarative management of virtual Kubernetes clusters through standard CAPI resources. This enterprise approach provides:
 
-- **Control Plane** - API server, etcd, and controller manager
-- **Isolated Resources** - Pods, services, ingresses, and storage
-- **RBAC System** - Complete role-based access control
-- **Network Isolation** - Separate networking stack
-- **Resource Management** - Independent quotas and limits
+- **GitOps Integration** - Manage vClusters through standard Kubernetes manifests
+- **Lifecycle Management** - Automated provisioning, scaling, and deprovisioning  
+- **Enterprise Features** - RBAC, resource quotas, and policy enforcement
+- **Multi-Cloud Support** - Deploy across different infrastructure providers
+- **Observability** - Native integration with monitoring and logging solutions
 
-## Why Use vCluster?
+## Why Use Helm Charts for vCluster?
 
-- **Cost Efficiency** - Share hardware resources while maintaining isolation
-- **Development Speed** - Spin up clusters in seconds, not minutes
-- **Security** - Complete isolation without cluster-admin privileges
-- **Scalability** - Run hundreds of virtual clusters on a single host cluster
-- **Simplicity** - Standard Kubernetes API, no learning curve
+- **Reproducible Deployments** - Version-controlled configurations
+- **Templating Power** - Dynamic configuration based on environments
+- **Dependency Management** - Handle complex deployment requirements
+- **Enterprise Standards** - Follows Kubernetes deployment best practices
+- **GitOps Ready** - Perfect for automated deployment pipelines
 
 ## Architecture Overview
 
 ```yaml
-# vCluster Architecture
-Host Kubernetes Cluster
-├── Namespace: team-a-dev
-│   └── vCluster: team-a-dev (K8s API Server + etcd)
-├── Namespace: team-a-staging  
-│   └── vCluster: team-a-staging (K8s API Server + etcd)
-├── Namespace: team-b-dev
-│   └── vCluster: team-b-dev (K8s API Server + etcd)
-└── Shared Infrastructure
-    ├── Container Runtime
-    ├── Storage Classes
-    └── Network Plugins
+# Enterprise vCluster Architecture
+Management Cluster (CAPI)
+├── Cluster API Core Components
+├── vCluster Provider (Helm Chart)
+├── Infrastructure Providers (AWS, Azure, etc.)
+└── Virtual Clusters (Helm Managed)
+    ├── vCluster A (Namespace: vcluster-demo)
+    ├── vCluster B (Namespace: vcluster-staging)  
+    └── vCluster C (Namespace: vcluster-prod)
 ```
 
 ## Prerequisites
@@ -55,354 +52,703 @@ Ensure your environment includes:
 # Required tools
 kubectl >= 1.25
 helm >= 3.8
-vcluster >= 0.19.0
+clusterctl >= 1.5
 
-# Access to a Kubernetes cluster with:
-# - Sufficient resources (2+ CPU, 4GB+ RAM available)
-# - Storage classes configured
-# - Network policies (optional but recommended)
+# A management cluster with:
+# - Cluster API v1.5+ installed
+# - vCluster provider installed via Helm
+# - Sufficient resources for virtual clusters
 ```
 
-## Step 1: Installing vCluster CLI
+## Step 1: Setting Up Cluster API with vCluster Provider
 
-First, let's install the vCluster CLI tool:
+First, let's set up Cluster API and install the vCluster provider using Helm charts:
+
+### Initialize Cluster API
 
 ```bash
-# Install vCluster CLI (Linux/macOS)
-curl -L -o vcluster "https://github.com/loft-sh/vcluster/releases/latest/download/vcluster-linux-amd64"
-sudo install -c -m 0755 vcluster /usr/local/bin
+# Initialize Cluster API (if not already done)
+clusterctl init
 
-# For macOS with Homebrew
-brew install loft-sh/tap/vcluster
-
-# For Windows (PowerShell)
-# Download from https://github.com/loft-sh/vcluster/releases/latest
-
-# Verify installation
-vcluster --version
+# Verify CAPI installation
+kubectl get providers -A
+kubectl get pods -n capi-system
 ```
 
-### Quick Start Demo
+### Install vCluster Provider via Helm
 
 ```bash
-# Create your first vCluster
-vcluster create my-demo-cluster
-
-# Connect to the vCluster
-vcluster connect my-demo-cluster
-
-# You're now inside the virtual cluster!
-kubectl get nodes
-kubectl get namespaces
-
-# Deploy a test application
-kubectl create deployment nginx --image=nginx --replicas=2
-kubectl expose deployment nginx --port=80 --type=LoadBalancer
-
-# Check the deployment
-kubectl get pods
-kubectl get services
-
-# Disconnect from vCluster
-vcluster disconnect
-
-# List all vClusters
-vcluster list
-
-# Delete the demo cluster
-vcluster delete my-demo-cluster
-```
-
-## Step 2: Creating vClusters with Custom Configuration
-
-For production use, you'll want to customize your vCluster configuration using values files:
-
-### Basic vCluster Configuration
-
-```bash
-# Create a values file for customization
-cat > vcluster-values.yaml << EOF
-# Syncer configuration
-syncer:
-  extraArgs:
-    - --out-kube-config-server=https://my-vcluster.domain.com
-  resources:
-    limits:
-      memory: 1Gi
-      cpu: 500m
-    requests:
-      memory: 256Mi
-      cpu: 100m
-
-# vCluster configuration  
-vcluster:
-  image: rancher/k3s:v1.29.0-k3s1
-  resources:
-    limits:
-      memory: 2Gi
-      cpu: 1000m
-    requests:
-      memory: 512Mi
-      cpu: 200m
-  
-  # Additional K3s arguments
-  extraArgs:
-    - --disable=traefik
-    - --disable=servicelb
-    - --disable=metrics-server
-
-# Storage configuration
-storage:
-  persistence: true
-  size: 5Gi
-
-# Service configuration
-service:
-  type: ClusterIP
-
-# Resource sync settings
-sync:
-  ingresses:
-    enabled: true
-  persistentvolumes:
-    enabled: true
-  storageclasses:
-    enabled: true
-EOF
-```
-
-### Deploy vCluster with Custom Values
-
-```bash
-# Create vCluster with custom configuration
-vcluster create production-demo \
-  --namespace production-demo \
-  --values vcluster-values.yaml
-
-# Alternative: Use Helm directly for more control
-helm repo add loft https://charts.loft.sh
+# Add the vCluster Helm repository
+helm repo add loft-sh https://charts.loft.sh
 helm repo update
 
-helm upgrade --install production-demo loft/vcluster \
-  --namespace production-demo \
-  --create-namespace \
-  --values vcluster-values.yaml \
+# Create namespace for vCluster provider
+kubectl create namespace capi-vcluster-system
+
+# Install the vCluster provider via Helm with enterprise configuration
+helm install vcluster-provider loft-sh/cluster-api-provider-vcluster \
+  --namespace capi-vcluster-system \
+  --set provider.version=v0.2.2 \
+  --set provider.resources.requests.memory=256Mi \
+  --set provider.resources.requests.cpu=100m \
+  --set provider.resources.limits.memory=512Mi \
+  --set provider.resources.limits.cpu=500m \
+  --set provider.replicas=1 \
   --wait
+
+# Verify provider installation
+kubectl get providers -A
+kubectl get pods -n capi-vcluster-system
 ```
 
-## Step 3: Multi-Environment Demo Setup
-
-Let's create a practical demo with multiple environments:
-
-### Development Environment
+### Verify Installation
 
 ```bash
-# Create development vCluster with minimal resources
-cat > dev-values.yaml << EOF
-syncer:
-  resources:
-    requests:
-      memory: 128Mi
-      cpu: 50m
-    limits:
-      memory: 512Mi
-      cpu: 200m
+# Check that the vCluster provider is ready
+kubectl get providers cluster-api-provider-vcluster -o yaml
 
-vcluster:
-  image: rancher/k3s:v1.29.0-k3s1
-  resources:
-    requests:
-      memory: 256Mi
-      cpu: 100m
-    limits:
-      memory: 1Gi
-      cpu: 500m
-  extraArgs:
-    - --disable=traefik
-    - --disable=servicelb
-
-storage:
-  persistence: false  # Ephemeral for development
-EOF
-
-# Deploy development environment
-vcluster create dev-environment \
-  --namespace dev-environment \
-  --values dev-values.yaml
+# Verify Custom Resource Definitions are installed
+kubectl get crd | grep vcluster
+kubectl api-resources | grep vcluster
 ```
 
-### Staging Environment
+## Step 2: Creating Professional Helm Charts for vCluster
+
+Let's create a professional Helm chart structure for our vCluster deployments:
+
+### Create Helm Chart Structure
 
 ```bash
-# Create staging vCluster with moderate resources
-cat > staging-values.yaml << EOF
-syncer:
+# Create Helm chart for vCluster deployments
+mkdir -p vcluster-enterprise/
+cd vcluster-enterprise/
+
+helm create .
+rm -rf templates/*  # We'll create our own templates
+
+# Create proper directory structure
+mkdir -p templates/environments
+mkdir -p templates/monitoring
+mkdir -p templates/security
+```
+
+### Chart.yaml Configuration
+
+```yaml
+# Chart.yaml
+apiVersion: v2
+name: vcluster-enterprise
+description: Enterprise-grade Helm chart for deploying vCluster with Cluster API
+type: application
+version: 0.1.0
+appVersion: "v0.19.5"
+
+dependencies:
+  - name: vcluster
+    version: "0.19.5"
+    repository: "https://charts.loft.sh"
+    condition: vcluster.enabled
+
+keywords:
+  - vcluster
+  - cluster-api
+  - kubernetes
+  - multi-tenancy
+  - enterprise
+
+maintainers:
+  - name: "DevOps Team"
+    email: "devops@yourcompany.com"
+
+annotations:
+  category: Infrastructure
+  license: Apache-2.0
+```
+
+### Values.yaml Template
+
+```yaml
+# values.yaml
+global:
+  domain: "company.com"
+  environment: "demo"
+  clusterName: "management-cluster"
+
+# vCluster configuration
+vcluster:
+  enabled: true
+  
+  # Basic configuration
+  config:
+    kubernetesVersion: "v1.29.0"
+    image: "rancher/k3s:v1.29.0-k3s1"
+  
+  # Resource configuration
   resources:
-    requests:
-      memory: 256Mi
-      cpu: 100m
-    limits:
-      memory: 1Gi
-      cpu: 500m
+    syncer:
+      requests:
+        memory: "256Mi"
+        cpu: "100m"
+      limits:
+        memory: "1Gi"
+        cpu: "500m"
+    
+    vcluster:
+      requests:
+        memory: "512Mi"
+        cpu: "200m"
+      limits:
+        memory: "2Gi"
+        cpu: "1000m"
+  
+  # Storage configuration
+  storage:
+    persistence: true
+    size: "5Gi"
+    storageClass: "fast-ssd"
+  
+  # Networking
+  service:
+    type: "ClusterIP"
+  
+  # Security
+  rbac:
+    create: true
+  
+  serviceAccount:
+    create: true
+    name: ""
+
+# Cluster API configuration
+clusterAPI:
+  enabled: true
+  provider: "vcluster"
+  
+  cluster:
+    name: ""  # Will be templated
+    namespace: ""  # Will be templated
+  
+  # Resource quotas for the virtual cluster
+  resourceQuota:
+    enabled: true
+    hard:
+      requests.cpu: "2"
+      requests.memory: "4Gi"
+      limits.cpu: "4"
+      limits.memory: "8Gi"
+      persistentvolumeclaims: "5"
+      services: "10"
+      pods: "20"
+
+# Monitoring configuration
+monitoring:
+  enabled: false
+  serviceMonitor:
+    enabled: false
+  grafana:
+    enabled: false
+
+# Network policies
+networkPolicies:
+  enabled: true
+
+# Ingress configuration
+ingress:
+  enabled: false
+  className: "nginx"
+  annotations: {}
+  hosts: []
+  tls: []
+```
+
+## Step 3: CAPI vCluster Resource Templates
+
+Create the core Cluster API resource templates for vCluster management:
+
+### Main vCluster Template
+
+```yaml
+# templates/vcluster.yaml
+{% raw %}
+{{- if .Values.clusterAPI.enabled }}
+apiVersion: infrastructure.cluster.x-k8s.io/v1alpha1
+kind: VCluster
+metadata:
+  name: {{ include "vcluster-enterprise.fullname" . }}
+  namespace: {{ .Values.clusterAPI.cluster.namespace | default .Release.Namespace }}
+  labels:
+    {{- include "vcluster-enterprise.labels" . | nindent 4 }}
+    app.kubernetes.io/component: vcluster
+    cluster.x-k8s.io/cluster-name: {{ .Values.clusterAPI.cluster.name | default (include "vcluster-enterprise.fullname" .) }}
+spec:
+  # Kubernetes version for the virtual cluster
+  kubernetesVersion: {{ .Values.vcluster.config.kubernetesVersion | default "v1.29.0" }}
+  
+  # Helm release configuration for vCluster
+  helmRelease:
+    chart:
+      name: "vcluster"
+      repo: "https://charts.loft.sh"
+      version: "0.19.5"
+    
+    values: |
+      # Syncer configuration
+      syncer:
+        {{- if .Values.vcluster.resources.syncer }}
+        resources:
+          {{- toYaml .Values.vcluster.resources.syncer | nindent 10 }}
+        {{- end }}
+        extraArgs:
+          - --out-kube-config-server=https://{{ include "vcluster-enterprise.fullname" . }}.{{ .Values.global.domain }}
+      
+      # vCluster server configuration
+      vcluster:
+        image: {{ .Values.vcluster.config.image | default "rancher/k3s:v1.29.0-k3s1" }}
+        {{- if .Values.vcluster.resources.vcluster }}
+        resources:
+          {{- toYaml .Values.vcluster.resources.vcluster | nindent 10 }}
+        {{- end }}
+        extraArgs:
+          - --disable=traefik
+          - --disable=servicelb
+          - --disable=metrics-server
+      
+      # Storage configuration
+      {{- if .Values.vcluster.storage }}
+      storage:
+        {{- toYaml .Values.vcluster.storage | nindent 8 }}
+      {{- end }}
+      
+      # Service configuration
+      {{- if .Values.vcluster.service }}
+      service:
+        {{- toYaml .Values.vcluster.service | nindent 8 }}
+      {{- end }}
+      
+      # RBAC configuration
+      {{- if .Values.vcluster.rbac.create }}
+      rbac:
+        clusterRole:
+          create: true
+        role:
+          create: true
+      {{- end }}
+      
+      # Service Account configuration
+      {{- if .Values.vcluster.serviceAccount.create }}
+      serviceAccount:
+        create: true
+        name: {{ .Values.vcluster.serviceAccount.name | default (include "vcluster-enterprise.serviceAccountName" .) }}
+      {{- end }}
+
+  # Resource management
+  {{- if .Values.clusterAPI.resourceQuota.enabled }}
+  resourceQuota:
+    {{- toYaml .Values.clusterAPI.resourceQuota.hard | nindent 4 }}
+  {{- end }}
+
+  # Networking
+  networking:
+    serviceDomain: "cluster.local"
+    podSubnet: "10.244.0.0/16"
+    serviceSubnet: "10.96.0.0/12"
+
+{{- end }}
+{% endraw %}
+```
+
+### Helper Templates
+
+```yaml
+# templates/_helpers.tpl
+{{/*
+Expand the name of the chart.
+*/}}
+{{- define "vcluster-enterprise.name" -}}
+{{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
+{{- end }}
+
+{{/*
+Create a default fully qualified app name.
+*/}}
+{{- define "vcluster-enterprise.fullname" -}}
+{{- if .Values.fullnameOverride }}
+{{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
+{{- else }}
+{{- $name := default .Chart.Name .Values.nameOverride }}
+{{- if contains $name .Release.Name }}
+{{- .Release.Name | trunc 63 | trimSuffix "-" }}
+{{- else }}
+{{- printf "%s-%s" .Release.Name $name | trunc 63 | trimSuffix "-" }}
+{{- end }}
+{{- end }}
+{{- end }}
+
+{{/*
+Create chart name and version as used by the chart label.
+*/}}
+{{- define "vcluster-enterprise.chart" -}}
+{{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
+{{- end }}
+
+{{/*
+Common labels
+*/}}
+{{- define "vcluster-enterprise.labels" -}}
+helm.sh/chart: {{ include "vcluster-enterprise.chart" . }}
+{{ include "vcluster-enterprise.selectorLabels" . }}
+{{- if .Chart.AppVersion }}
+app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
+{{- end }}
+app.kubernetes.io/managed-by: {{ .Release.Service }}
+app.kubernetes.io/part-of: vcluster-enterprise
+{{- end }}
+
+{{/*
+Selector labels
+*/}}
+{{- define "vcluster-enterprise.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "vcluster-enterprise.name" . }}
+app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end }}
+
+{{/*
+Create the name of the service account to use
+*/}}
+{{- define "vcluster-enterprise.serviceAccountName" -}}
+{{- if .Values.vcluster.serviceAccount.create }}
+{{- default (include "vcluster-enterprise.fullname" .) .Values.vcluster.serviceAccount.name }}
+{{- else }}
+{{- default "default" .Values.vcluster.serviceAccount.name }}
+{{- end }}
+{{- end }}
+```
+
+### Resource Quota Template
+
+```yaml
+# templates/security/resource-quota.yaml
+{% raw %}
+{{- if .Values.clusterAPI.resourceQuota.enabled }}
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: {{ include "vcluster-enterprise.fullname" . }}-quota
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "vcluster-enterprise.labels" . | nindent 4 }}
+spec:
+  hard:
+    {{- toYaml .Values.clusterAPI.resourceQuota.hard | nindent 4 }}
+---
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: {{ include "vcluster-enterprise.fullname" . }}-limits
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "vcluster-enterprise.labels" . | nindent 4 }}
+spec:
+  limits:
+  - default:
+      memory: "512Mi"
+      cpu: "500m"
+    defaultRequest:
+      memory: "128Mi"
+      cpu: "100m"
+    type: Container
+  - max:
+      memory: "2Gi"
+      cpu: "1"
+    min:
+      memory: "64Mi"
+      cpu: "50m"
+    type: Container
+{{- end }}
+{% endraw %}
+```
+
+## Step 4: Environment-Specific Values and Helm Deployments
+
+Create environment-specific values files for different deployment scenarios:
+
+### Development Environment Values
+
+```yaml
+# values-dev.yaml
+global:
+  domain: "dev.company.com"
+  environment: "development"
 
 vcluster:
-  image: rancher/k3s:v1.29.0-k3s1
+  enabled: true
+  
+  config:
+    kubernetesVersion: "v1.29.0"
+  
   resources:
-    requests:
-      memory: 512Mi
-      cpu: 200m
-    limits:
-      memory: 2Gi
-      cpu: 1000m
-  extraArgs:
-    - --disable=traefik
+    syncer:
+      requests:
+        memory: "128Mi"
+        cpu: "50m"
+      limits:
+        memory: "512Mi"
+        cpu: "200m"
+    
+    vcluster:
+      requests:
+        memory: "256Mi"
+        cpu: "100m"
+      limits:
+        memory: "1Gi"
+        cpu: "500m"
+  
+  storage:
+    persistence: false  # Ephemeral for development
+  
+  service:
+    type: "ClusterIP"
 
-storage:
-  persistence: true
-  size: 2Gi
+clusterAPI:
+  enabled: true
+  cluster:
+    name: "vcluster-dev"
+    namespace: "vcluster-dev"
+  
+  resourceQuota:
+    enabled: true
+    hard:
+      requests.cpu: "1"
+      requests.memory: "2Gi"
+      limits.cpu: "2"
+      limits.memory: "4Gi"
+      persistentvolumeclaims: "2"
+      services: "5"
+      pods: "10"
 
-# Enable ingress for external access
+monitoring:
+  enabled: false
+
+networkPolicies:
+  enabled: false  # Simplified for development
+
+ingress:
+  enabled: false
+```
+
+### Staging Environment Values
+
+```yaml
+# values-staging.yaml
+global:
+  domain: "staging.company.com"
+  environment: "staging"
+
+vcluster:
+  enabled: true
+  
+  config:
+    kubernetesVersion: "v1.29.0"
+  
+  resources:
+    syncer:
+      requests:
+        memory: "256Mi"
+        cpu: "100m"
+      limits:
+        memory: "1Gi"
+        cpu: "500m"
+    
+    vcluster:
+      requests:
+        memory: "512Mi"
+        cpu: "200m"
+      limits:
+        memory: "2Gi"
+        cpu: "1000m"
+  
+  storage:
+    persistence: true
+    size: "5Gi"
+    storageClass: "standard"
+  
+  service:
+    type: "ClusterIP"
+
+clusterAPI:
+  enabled: true
+  cluster:
+    name: "vcluster-staging"
+    namespace: "vcluster-staging"
+  
+  resourceQuota:
+    enabled: true
+    hard:
+      requests.cpu: "2"
+      requests.memory: "4Gi"
+      limits.cpu: "4"
+      limits.memory: "8Gi"
+      persistentvolumeclaims: "5"
+      services: "10"
+      pods: "20"
+
+monitoring:
+  enabled: true
+  serviceMonitor:
+    enabled: true
+
+networkPolicies:
+  enabled: true
+
 ingress:
   enabled: true
-  host: staging.yourdomain.com
-EOF
+  className: "nginx"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-staging"
+  hosts:
+    - host: "vcluster-staging.company.com"
+      paths:
+        - path: "/"
+          pathType: "Prefix"
+  tls:
+    - secretName: "vcluster-staging-tls"
+      hosts:
+        - "vcluster-staging.company.com"
+```
+
+### Production Environment Values
+
+```yaml
+# values-prod.yaml
+global:
+  domain: "company.com"
+  environment: "production"
+
+vcluster:
+  enabled: true
+  
+  config:
+    kubernetesVersion: "v1.29.0"
+  
+  resources:
+    syncer:
+      requests:
+        memory: "512Mi"
+        cpu: "200m"
+      limits:
+        memory: "2Gi"
+        cpu: "1000m"
+    
+    vcluster:
+      requests:
+        memory: "1Gi"
+        cpu: "500m"
+      limits:
+        memory: "4Gi"
+        cpu: "2000m"
+  
+  storage:
+    persistence: true
+    size: "20Gi"
+    storageClass: "fast-ssd"
+  
+  service:
+    type: "ClusterIP"
+
+clusterAPI:
+  enabled: true
+  cluster:
+    name: "vcluster-prod"
+    namespace: "vcluster-prod"
+  
+  resourceQuota:
+    enabled: true
+    hard:
+      requests.cpu: "4"
+      requests.memory: "8Gi"
+      limits.cpu: "8"
+      limits.memory: "16Gi"
+      persistentvolumeclaims: "10"
+      services: "20"
+      pods: "50"
+
+monitoring:
+  enabled: true
+  serviceMonitor:
+    enabled: true
+  grafana:
+    enabled: true
+
+networkPolicies:
+  enabled: true
+
+ingress:
+  enabled: true
+  className: "nginx"
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+  hosts:
+    - host: "vcluster-prod.company.com"
+      paths:
+        - path: "/"
+          pathType: "Prefix"
+  tls:
+    - secretName: "vcluster-prod-tls"
+      hosts:
+        - "vcluster-prod.company.com"
+```
+
+### Deploy Environments with Helm
+
+```bash
+# Deploy development environment
+helm upgrade --install vcluster-dev ./vcluster-enterprise \
+  --namespace vcluster-dev \
+  --create-namespace \
+  --values values-dev.yaml \
+  --wait \
+  --timeout 10m
 
 # Deploy staging environment
-vcluster create staging-environment \
-  --namespace staging-environment \
-  --values staging-values.yaml
-```
-
-### Production Environment
-
-```bash
-# Create production vCluster with full resources
-cat > prod-values.yaml << EOF
-syncer:
-  resources:
-    requests:
-      memory: 512Mi
-      cpu: 200m
-    limits:
-      memory: 2Gi
-      cpu: 1000m
-
-vcluster:
-  image: rancher/k3s:v1.29.0-k3s1
-  resources:
-    requests:
-      memory: 1Gi
-      cpu: 500m
-    limits:
-      memory: 4Gi
-      cpu: 2000m
-
-storage:
-  persistence: true
-  size: 10Gi
-
-# Production ingress configuration
-ingress:
-  enabled: true
-  host: prod.yourdomain.com
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-prod
-    kubernetes.io/ingress.class: nginx
-
-# Resource quotas for production
-resourceQuota:
-  hard:
-    requests.cpu: "4"
-    requests.memory: "8Gi"
-    limits.cpu: "8"
-    limits.memory: "16Gi"
-    persistentvolumeclaims: "10"
-EOF
+helm upgrade --install vcluster-staging ./vcluster-enterprise \
+  --namespace vcluster-staging \
+  --create-namespace \
+  --values values-staging.yaml \
+  --wait \
+  --timeout 10m
 
 # Deploy production environment
-vcluster create prod-environment \
-  --namespace prod-environment \
-  --values prod-values.yaml
+helm upgrade --install vcluster-prod ./vcluster-enterprise \
+  --namespace vcluster-prod \
+  --create-namespace \
+  --values values-prod.yaml \
+  --wait \
+  --timeout 15m
+
+# Verify deployments
+kubectl get vclusters --all-namespaces
+kubectl get pods --all-namespaces | grep vcluster
 ```
 
-## Step 4: Working with Multiple vClusters
-
-Now let's learn how to manage and switch between multiple virtual clusters:
-
-### List and Connect to Environments
+### Validation and Testing
 
 ```bash
-# List all vClusters
-vcluster list
+# Check CAPI resources
+kubectl get clusters --all-namespaces
+kubectl get machines --all-namespaces
 
-# Connect to development environment
-vcluster connect dev-environment
+# Verify vCluster provider status
+kubectl get providers -A
+kubectl describe provider cluster-api-provider-vcluster
 
-# You're now in the dev vCluster context
-kubectl config current-context
-kubectl get namespaces
-
-# Create a development application
-kubectl create namespace dev-app
-kubectl create deployment web-app --image=nginx:alpine -n dev-app
-kubectl expose deployment web-app --port=80 --type=ClusterIP -n dev-app
-
-# Check the application
-kubectl get pods -n dev-app
-kubectl get services -n dev-app
-
-# Disconnect from dev environment
-vcluster disconnect
-```
-
-### Switch to Staging Environment
-
-```bash
-# Connect to staging environment
-vcluster connect staging-environment
-
-# Create the same application in staging
-kubectl create namespace staging-app
-kubectl create deployment web-app --image=nginx:1.21 -n staging-app
-kubectl expose deployment web-app --port=80 --type=LoadBalancer -n staging-app
-
-# Add staging-specific configuration
-kubectl create configmap app-config \
-  --from-literal=env=staging \
-  --from-literal=debug=false \
-  -n staging-app
-
-# Apply the config to the deployment
-kubectl set env deployment/web-app --from=configmap/app-config -n staging-app
-
-# Check staging deployment
-kubectl get pods -n staging-app
-kubectl get services -n staging-app
-
-# Disconnect from staging
-vcluster disconnect
-```
-
-### Isolated Testing
-
-```bash
-# Each vCluster is completely isolated
-# Connect to dev environment
-vcluster connect dev-environment
-
-# Check what exists in dev (only dev resources)
-kubectl get pods --all-namespaces
-kubectl get services --all-namespaces
-
-# Switch to staging and verify isolation
-vcluster disconnect
-vcluster connect staging-environment
-
-# Check what exists in staging (only staging resources)
-kubectl get pods --all-namespaces
-kubectl get services --all-namespaces
-
-vcluster disconnect
+# Test connectivity to each environment
+for env in dev staging prod; do
+  echo "Testing vcluster-$env..."
+  kubectl get vcluster vcluster-$env -n vcluster-$env -o yaml
+  kubectl get pods -n vcluster-$env -l app=vcluster
+done
 ```
 
 ## Step 5: Advanced Configuration and Security

@@ -310,174 +310,66 @@ demoApps:
     enabled: false
 ```
 
-## Step 5: Deployment with PowerShell
+## Step 5: Quick Deployment with CLI
 
-Create a professional deployment script for Windows environments:
+Now let's deploy our vCluster demo with simple CLI commands:
 
-```powershell
-# deploy-demo.ps1
-param(
-    [Parameter(Mandatory=$false)]
-    [string]$Environment = "demo",
-    
-    [Parameter(Mandatory=$false)]
-    [string]$Domain = "local",
-    
-    [Parameter(Mandatory=$false)]
-    [string]$KubeConfig = $null,
-    
-    [Parameter(Mandatory=$false)]
-    [switch]$DryRun
-)
+### Prerequisites Check
 
-# Set error handling
-$ErrorActionPreference = "Stop"
+```bash
+# Verify required tools are installed
+helm version
+kubectl version --client
+vcluster --version
 
-Write-Host "🚀 Starting vCluster Demo Deployment" -ForegroundColor Green
-Write-Host "Environment: $Environment" -ForegroundColor Cyan
-Write-Host "Domain: $Domain" -ForegroundColor Cyan
+# Verify cluster access
+kubectl cluster-info
+```
 
-# Verify prerequisites
-if (-not (Get-Command helm -ErrorAction SilentlyContinue)) {
-    Write-Error "❌ Helm is not installed or not in PATH"
-    exit 1
-}
+### Deploy vCluster with Helm
 
-if (-not (Get-Command kubectl -ErrorAction SilentlyContinue)) {
-    Write-Error "❌ kubectl is not installed or not in PATH"
-    exit 1
-}
+```bash
+# Create the namespace
+kubectl create namespace vcluster-demo
 
-# Set kubeconfig if provided
-if ($KubeConfig) {
-    $env:KUBECONFIG = $KubeConfig
-    Write-Host "📝 Using kubeconfig: $KubeConfig" -ForegroundColor Yellow
-}
+# Deploy using our Helm chart
+helm upgrade --install vcluster-demo . \
+  --namespace vcluster-demo \
+  --values values-demo.yaml \
+  --timeout 10m \
+  --wait
 
-# Check CAPI providers
-Write-Host "🔍 Checking Cluster API providers..." -ForegroundColor Blue
-try {
-    $capiProviders = kubectl get providers -A -o jsonpath='{range .items[*]}{.metadata.name}{"\t"}{.status.installedVersion}{"\n"}{end}' 2>$null
-    if ($LASTEXITCODE -eq 0 -and $capiProviders) {
-        Write-Host "✅ CAPI providers found:" -ForegroundColor Green
-        Write-Host $capiProviders -ForegroundColor Gray
-        $useCAPI = $true
-    } else {
-        Write-Host "⚠️ CAPI providers not found, using standard Helm deployment" -ForegroundColor Yellow
-        $useCAPI = $false
-    }
-} catch {
-    Write-Host "⚠️ Unable to check CAPI providers, using standard Helm deployment" -ForegroundColor Yellow
-    $useCAPI = $false
-}
+# Verify deployment
+kubectl get pods -n vcluster-demo
+```
 
-# Create namespace
-$namespace = "vcluster-$Environment"
-Write-Host "📦 Creating namespace: $namespace" -ForegroundColor Blue
+### Connect to vCluster
 
-if (-not $DryRun) {
-    kubectl create namespace $namespace --dry-run=client -o yaml | kubectl apply -f -
-    if ($LASTEXITCODE -ne 0) {
-        Write-Error "❌ Failed to create namespace"
-        exit 1
-    }
-}
+```bash
+# Connect to the virtual cluster
+vcluster connect vcluster-demo --namespace vcluster-demo
 
-# Prepare values
-$valuesFile = "values-$Environment.yaml"
-if (-not (Test-Path $valuesFile)) {
-    Write-Error "❌ Values file not found: $valuesFile"
-    exit 1
-}
+# Verify connection (you're now inside the vCluster)
+kubectl get nodes
+kubectl get namespaces
 
-# Update domain in values
-Write-Host "🔧 Updating configuration..." -ForegroundColor Blue
-$tempValues = "values-$Environment-temp.yaml"
-(Get-Content $valuesFile) -replace 'domain: ".*"', "domain: `"$Domain`"" | Set-Content $tempValues
+# Deploy a test application
+kubectl create namespace test-app
+kubectl create deployment nginx --image=nginx --replicas=2 -n test-app
+kubectl expose deployment nginx --port=80 --type=ClusterIP -n test-app
 
-# Deploy with Helm
-$releaseName = "vcluster-$Environment"
-$chartPath = "."
+# Check the deployment
+kubectl get pods -n test-app
+```
 
-Write-Host "🚀 Deploying vCluster with Helm..." -ForegroundColor Blue
+### Disconnect from vCluster
 
-$helmCommand = @(
-    "helm", "upgrade", "--install", $releaseName, $chartPath,
-    "--namespace", $namespace,
-    "--values", $tempValues,
-    "--timeout", "10m0s",
-    "--wait"
-)
+```bash
+# Return to the host cluster
+vcluster disconnect
 
-if ($DryRun) {
-    $helmCommand += "--dry-run"
-}
-
-Write-Host "Executing: $($helmCommand -join ' ')" -ForegroundColor Gray
-
-if (-not $DryRun) {
-    & $helmCommand[0] $helmCommand[1..($helmCommand.Length-1)]
-    
-    if ($LASTEXITCODE -ne 0) {
-        Write-Error "❌ Helm deployment failed"
-        Remove-Item $tempValues -ErrorAction SilentlyContinue
-        exit 1
-    }
-}
-
-# Cleanup temp file
-Remove-Item $tempValues -ErrorAction SilentlyContinue
-
-if (-not $DryRun) {
-    # Wait for vCluster to be ready
-    Write-Host "⏳ Waiting for vCluster to be ready..." -ForegroundColor Blue
-    
-    $timeout = 300
-    $elapsed = 0
-    $interval = 10
-    
-    while ($elapsed -lt $timeout) {
-        try {
-            $ready = kubectl get pods -n $namespace -l app=vcluster -o jsonpath='{.items[0].status.phase}' 2>$null
-            if ($ready -eq "Running") {
-                Write-Host "✅ vCluster is ready!" -ForegroundColor Green
-                break
-            }
-        } catch {
-            # Continue waiting
-        }
-        
-        Start-Sleep $interval
-        $elapsed += $interval
-        Write-Host "   Still waiting... ($elapsed/$timeout seconds)" -ForegroundColor Gray
-    }
-    
-    if ($elapsed -ge $timeout) {
-        Write-Host "⚠️ Timeout waiting for vCluster to be ready" -ForegroundColor Yellow
-    }
-    
-    # Display connection information
-    Write-Host ""
-    Write-Host "🎉 Deployment Summary:" -ForegroundColor Green
-    Write-Host "  Release Name: $releaseName" -ForegroundColor Cyan
-    Write-Host "  Namespace: $namespace" -ForegroundColor Cyan
-    Write-Host "  Domain: $Domain" -ForegroundColor Cyan
-    
-    # Show next steps
-    Write-Host ""
-    Write-Host "📚 Next Steps:" -ForegroundColor Yellow
-    Write-Host "  1. Connect to vCluster:" -ForegroundColor White
-    Write-Host "     vcluster connect $releaseName -n $namespace" -ForegroundColor Gray
-    Write-Host ""
-    Write-Host "  2. Access via Ingress (if enabled):" -ForegroundColor White
-    Write-Host "     https://$Environment.$Domain" -ForegroundColor Gray
-    Write-Host ""
-    Write-Host "  3. Check status:" -ForegroundColor White
-    Write-Host "     kubectl get pods -n $namespace" -ForegroundColor Gray
-    
-} else {
-    Write-Host "✅ Dry-run completed successfully" -ForegroundColor Green
-}
+# Verify you're back on the host cluster
+kubectl get nodes
 ```
 
 ## Step 6: GitOps Integration
@@ -599,9 +491,67 @@ spec:
 EOF
 ```
 
-## Step 5: Adding Ingress Support
+## Step 7: Adding Ingress Support
 
-## Step 7: Production Readiness Checklist
+Configure external access to your vCluster:
+
+### Create Ingress Template
+
+```yaml
+# templates/ingress.yaml
+{% raw %}
+{{- if .Values.vcluster.ingress.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ include "vcluster-demo.fullname" . }}-ingress
+  namespace: {{ .Values.vcluster.namespace | default .Release.Namespace }}
+  labels:
+    {{- include "vcluster-demo.labels" . | nindent 4 }}
+  {{- with .Values.vcluster.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if .Values.vcluster.ingress.className }}
+  ingressClassName: {{ .Values.vcluster.ingress.className }}
+  {{- end }}
+  {{- if .Values.vcluster.ingress.tls }}
+  tls:
+    {{- range .Values.vcluster.ingress.tls }}
+    - hosts:
+        {{- range .hosts }}
+        - {{ . | quote }}
+        {{- end }}
+      secretName: {{ .secretName }}
+    {{- end }}
+  {{- end }}
+  rules:
+    - host: {{ .Values.vcluster.ingress.host | quote }}
+      http:
+        paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: {{ include "vcluster-demo.fullname" . }}
+              port:
+                number: 443
+{{- end }}
+{% endraw %}
+```
+
+### Test Ingress Access
+
+```bash
+# After deployment, test ingress access
+curl -k https://demo.local/version
+
+# Or access via browser
+open https://demo.local
+```
+
+## Step 8: Production Readiness Checklist
 
 Ensure your vCluster demo meets enterprise standards:
 
@@ -723,7 +673,7 @@ spec:
           name: kube-system
 ```
 
-## Step 8: Troubleshooting and Maintenance
+## Step 9: Troubleshooting and Maintenance
 
 Common issues and solutions:
 
@@ -783,7 +733,7 @@ vcluster:
     - "--etcd-arg=--max-request-bytes=33554432"
 ```
 
-## Step 9: Cleanup and Next Steps
+## Step 10: Cleanup and Next Steps
 
 ### Cleanup Commands
 
@@ -820,6 +770,11 @@ kubectl delete vcluster vcluster-demo -n vcluster-demo
 - [ ] GitOps deployment automated
 - [ ] Documentation complete
 
+### Managing Multiple vClusters
+
+If you need multiple environments, you can create additional vClusters:
+
+```bash
 # Create production environment
 vcluster create prod-team --namespace vcluster-prod
 
@@ -844,7 +799,7 @@ kubectl config current-context
 vcluster disconnect
 ```
 
-## Step 7: Monitoring and Observability
+## Step 11: Monitoring and Observability
 
 Add monitoring to your vCluster demo:
 
@@ -873,7 +828,7 @@ kubectl port-forward -n monitoring svc/monitoring-grafana 3000:80
 # Username: admin, Password: admin123
 ```
 
-## Step 8: Cleanup and Resource Management
+## Step 12: Resource Management
 
 Understanding cleanup is crucial for demos:
 
@@ -897,7 +852,7 @@ vcluster delete staging-team
 vcluster delete prod-team
 ```
 
-## Step 9: Automation with Scripts
+## Step 13: Automation with Scripts
 
 Create reusable demo scripts:
 

@@ -361,6 +361,7 @@ spec:
 
 ```yaml
 # templates/_helpers.tpl
+{% raw %}
 {{/*
 Expand the name of the chart.
 */}}
@@ -422,6 +423,7 @@ Create the name of the service account to use
 {{- default "default" .Values.vcluster.serviceAccount.name }}
 {{- end }}
 {{- end }}
+{% endraw %}
 ```
 
 ### Resource Quota Template

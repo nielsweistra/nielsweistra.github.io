@@ -751,145 +751,299 @@ for env in dev staging prod; do
 done
 ```
 
-## Step 5: Advanced Configuration and Security
+## Step 5: Advanced Helm Templates and Security
 
-Let's configure security policies and advanced features for production use:
+Create advanced Helm templates for security policies and enterprise features:
 
-### Network Policies
+### Network Policy Templates
 
-```bash
-# Connect to production environment
-vcluster connect prod-environment
-
-# Create network policies for pod isolation
-cat > network-policy.yaml << EOF
+```yaml
+# templates/security/network-policies.yaml
+{% raw %}
+{{- if .Values.networkPolicies.enabled }}
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: deny-all-ingress
-  namespace: default
+  name: {{ include "vcluster-enterprise.fullname" . }}-deny-all
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "vcluster-enterprise.labels" . | nindent 4 }}
 spec:
-  podSelector: {}
+  podSelector:
+    matchLabels:
+      app: vcluster
   policyTypes:
   - Ingress
   - Egress
   egress:
+  # Allow DNS
   - to: []
     ports:
     - protocol: TCP
       port: 53
     - protocol: UDP
       port: 53
+  # Allow access to Kubernetes API
+  - to: []
+    ports:
+    - protocol: TCP
+      port: 6443
+  # Allow inter-vCluster communication
+  ingress:
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: {{ .Release.Namespace }}
+    ports:
+    - protocol: TCP
+      port: 8443
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: allow-web-app
-  namespace: default
+  name: {{ include "vcluster-enterprise.fullname" . }}-allow-ingress
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "vcluster-enterprise.labels" . | nindent 4 }}
 spec:
   podSelector:
     matchLabels:
-      app: web-app
+      app: vcluster
   policyTypes:
   - Ingress
   ingress:
+  {{- if .Values.ingress.enabled }}
+  # Allow ingress controller access
   - from:
-    - podSelector:
+    - namespaceSelector:
         matchLabels:
-          app: frontend
+          name: ingress-nginx
     ports:
     - protocol: TCP
-      port: 80
-EOF
-
-kubectl apply -f network-policy.yaml
+      port: 8443
+  {{- end }}
+  # Allow monitoring access
+  {{- if .Values.monitoring.enabled }}
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: monitoring
+    ports:
+    - protocol: TCP
+      port: 8080
+  {{- end }}
+{{- end }}
+{% endraw %}
 ```
 
-### RBAC Configuration
+### RBAC Templates
 
-```bash
-# Create service account with limited permissions
-cat > rbac.yaml << EOF
+```yaml
+# templates/security/rbac.yaml
+{% raw %}
+{{- if .Values.vcluster.rbac.create }}
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: app-service-account
-  namespace: default
+  name: {{ include "vcluster-enterprise.serviceAccountName" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "vcluster-enterprise.labels" . | nindent 4 }}
+  {{- with .Values.vcluster.serviceAccount.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+automountServiceAccountToken: {{ .Values.vcluster.serviceAccount.automount | default true }}
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
-  name: app-role
-  namespace: default
+  name: {{ include "vcluster-enterprise.fullname" . }}-role
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "vcluster-enterprise.labels" . | nindent 4 }}
 rules:
 - apiGroups: [""]
-  resources: ["pods", "services", "configmaps"]
-  verbs: ["get", "list", "watch", "create", "update", "patch"]
+  resources: ["pods", "services", "endpoints", "persistentvolumeclaims", "events", "configmaps", "secrets"]
+  verbs: ["*"]
+- apiGroups: [""]
+  resources: ["namespaces"]
+  verbs: ["get", "list", "watch"]
 - apiGroups: ["apps"]
-  resources: ["deployments"]
-  verbs: ["get", "list", "watch", "create", "update", "patch"]
+  resources: ["deployments", "replicasets", "statefulsets", "daemonsets"]
+  verbs: ["*"]
+- apiGroups: ["extensions", "networking.k8s.io"]
+  resources: ["ingresses", "networkpolicies"]
+  verbs: ["*"]
+- apiGroups: [""]
+  resources: ["nodes"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: [""]
+  resources: ["pods/log"]
+  verbs: ["get", "list"]
+- apiGroups: [""]
+  resources: ["pods/exec", "pods/attach"]
+  verbs: ["create"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
-  name: app-rolebinding
-  namespace: default
+  name: {{ include "vcluster-enterprise.fullname" . }}-rolebinding
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "vcluster-enterprise.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ include "vcluster-enterprise.fullname" . }}-role
 subjects:
 - kind: ServiceAccount
-  name: app-service-account
-  namespace: default
-roleRef:
-  kind: Role
-  name: app-role
-  apiGroup: rbac.authorization.k8s.io
-EOF
-
-kubectl apply -f rbac.yaml
+  name: {{ include "vcluster-enterprise.serviceAccountName" . }}
+  namespace: {{ .Release.Namespace }}
+{{- end }}
+{% endraw %}
 ```
 
-### Resource Quotas
+### Pod Security Standards Template
 
-```bash
-# Apply resource quotas to limit resource usage
-cat > resource-quota.yaml << EOF
+```yaml
+# templates/security/pod-security.yaml
+{% raw %}
+{{- if .Values.vcluster.podSecurity.enabled }}
 apiVersion: v1
-kind: ResourceQuota
+kind: Namespace
 metadata:
-  name: namespace-quota
-  namespace: default
-spec:
-  hard:
-    requests.cpu: "2"
-    requests.memory: 4Gi
-    limits.cpu: "4"
-    limits.memory: 8Gi
-    persistentvolumeclaims: "5"
-    services: "10"
-    pods: "20"
+  name: {{ .Release.Namespace }}
+  labels:
+    {{- include "vcluster-enterprise.labels" . | nindent 4 }}
+    pod-security.kubernetes.io/enforce: {{ .Values.vcluster.podSecurity.enforce | default "restricted" }}
+    pod-security.kubernetes.io/audit: {{ .Values.vcluster.podSecurity.audit | default "restricted" }}
+    pod-security.kubernetes.io/warn: {{ .Values.vcluster.podSecurity.warn | default "restricted" }}
 ---
 apiVersion: v1
 kind: LimitRange
 metadata:
-  name: namespace-limits
-  namespace: default
+  name: {{ include "vcluster-enterprise.fullname" . }}-pod-limits
+  namespace: {{ .Release.Namespace }}
+  labels:
+    {{- include "vcluster-enterprise.labels" . | nindent 4 }}
 spec:
   limits:
   - default:
+      memory: {{ .Values.vcluster.podSecurity.defaultLimits.memory | default "512Mi" }}
+      cpu: {{ .Values.vcluster.podSecurity.defaultLimits.cpu | default "500m" }}
+      ephemeral-storage: {{ .Values.vcluster.podSecurity.defaultLimits.ephemeralStorage | default "1Gi" }}
+    defaultRequest:
+      memory: {{ .Values.vcluster.podSecurity.defaultRequests.memory | default "128Mi" }}
+      cpu: {{ .Values.vcluster.podSecurity.defaultRequests.cpu | default "100m" }}
+      ephemeral-storage: {{ .Values.vcluster.podSecurity.defaultRequests.ephemeralStorage | default "256Mi" }}
+    type: Container
+  - max:
+      memory: {{ .Values.vcluster.podSecurity.maxLimits.memory | default "2Gi" }}
+      cpu: {{ .Values.vcluster.podSecurity.maxLimits.cpu | default "2" }}
+      ephemeral-storage: {{ .Values.vcluster.podSecurity.maxLimits.ephemeralStorage | default "4Gi" }}
+    type: Container
+{{- end }}
+{% endraw %}
+```
+
+### Security Values Configuration
+
+```yaml
+# Add to values.yaml for security configuration
+vcluster:
+  rbac:
+    create: true
+  
+  serviceAccount:
+    create: true
+    name: ""
+    annotations: {}
+    automount: true
+  
+  podSecurity:
+    enabled: true
+    enforce: "restricted"
+    audit: "restricted" 
+    warn: "restricted"
+    
+    defaultLimits:
       memory: "512Mi"
       cpu: "500m"
-    defaultRequest:
+      ephemeralStorage: "1Gi"
+    
+    defaultRequests:
       memory: "128Mi"
       cpu: "100m"
-    type: Container
+      ephemeralStorage: "256Mi"
+    
+    maxLimits:
+      memory: "2Gi"
+      cpu: "2"
+      ephemeralStorage: "4Gi"
+
+networkPolicies:
+  enabled: true
+
+# Security contexts
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 65534
+  fsGroup: 65534
+  seccompProfile:
+    type: RuntimeDefault
+  
+containerSecurityContext:
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: true
+  runAsNonRoot: true
+  runAsUser: 65534
+```
+
+### Deploy with Security Features
+
+```bash
+# Create production values with security enabled
+cat > values-prod-secure.yaml << EOF
+# Include all previous production values plus security
+$(cat values-prod.yaml)
+
+# Additional security configuration
+vcluster:
+  podSecurity:
+    enabled: true
+    enforce: "restricted"
+  
+  rbac:
+    create: true
+  
+  serviceAccount:
+    create: true
+
+networkPolicies:
+  enabled: true
+
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 65534
+  fsGroup: 65534
 EOF
 
-kubectl apply -f resource-quota.yaml
+# Deploy with enhanced security
+helm upgrade --install vcluster-prod ./vcluster-enterprise \
+  --namespace vcluster-prod \
+  --create-namespace \
+  --values values-prod-secure.yaml \
+  --wait \
+  --timeout 15m
 
-# Verify quotas are applied
-kubectl describe quota
-kubectl describe limitrange
-
-vcluster disconnect
+# Verify security policies
+kubectl get networkpolicies -n vcluster-prod
+kubectl get rolebindings -n vcluster-prod
+kubectl describe namespace vcluster-prod
 ```
 
 ## Step 6: GitOps Integration

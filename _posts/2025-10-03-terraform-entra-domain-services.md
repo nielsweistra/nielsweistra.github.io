@@ -6,8 +6,6 @@ categories: [Azure, Terraform, Authentication, Infrastructure]
 tags: [azure, terraform, entra-id, domain-services, authentication, infrastructure-as-code, devops, security]
 ---
 
-## Introduction
-
 Microsoft Entra Domain Services (formerly Azure AD Domain Services) is a crucial component for organizations looking to implement hybrid identity solutions in Azure. While Azure provides managed domain controllers, setting up a production-ready deployment with proper security, monitoring, and networking requires careful planning and configuration.
 
 In this post, I'll walk you through a comprehensive Terraform template I've developed that automates the deployment of Microsoft Entra Domain Services with enterprise-grade security, monitoring, and CI/CD integration.

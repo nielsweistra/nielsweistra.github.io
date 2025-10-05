@@ -26,6 +26,23 @@ collections:
     output: true
     permalink: /blog/:year/:month/:day/:title/
 
+# SEO Settings
+seo:
+  type: Person
+  name: "Niels Weistra"
+  links:
+    - "https://linkedin.com/in/nielswei"
+    - "https://github.com/itlusions"
+    - "https://itlusions.com"
+    - "https://nielsweistra.github.io"
+
+# Social Media
+social:
+  name: "Niels Weistra"
+  links:
+    - "https://linkedin.com/in/nielswei"
+    - "https://github.com/itlusions"
+
 # Plugins
 plugins:
   - jekyll-paginate

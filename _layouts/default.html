@@ -10,9 +10,50 @@
         <title>{{ site.title }}</title>
     {% endif %}
     
-    <meta name="description" content="{% if page.excerpt %}{{ page.excerpt | strip_html | strip_newlines | truncate: 160 }}{% else %}{{ site.description }}{% endif %}">
-    <meta name="keywords" content="Niels Weistra, DevOps, Cloud Architecture, Kubernetes, Azure, GitOps, ITlusions, Cloud-Native, DevSecOps">
+    <!-- SEO Meta Tags -->
+    {% seo %}
+    
+    <!-- Additional Meta Tags -->
+    <meta name="robots" content="index, follow">
+    <meta name="googlebot" content="index, follow">
+    <meta name="keywords" content="{% if page.tags %}{{ page.tags | join: ', ' }}, {% endif %}Niels Weistra, DevOps, Cloud Architecture, Kubernetes, Azure, GitOps, ITlusions, Cloud-Native, DevSecOps">
     <meta name="author" content="{{ site.author.name }}">
+    
+    <!-- Verification (add your verification codes here when available) -->
+    <!-- <meta name="google-site-verification" content="YOUR_GOOGLE_VERIFICATION_CODE" /> -->
+    <!-- <meta name="msvalidate.01" content="YOUR_BING_VERIFICATION_CODE" /> -->
+    
+    <!-- Schema.org Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "{{ site.author.name }}",
+      "url": "{{ site.url }}",
+      "jobTitle": "DevOps Engineer & Cloud Architect",
+      "worksFor": {
+        "@type": "Organization",
+        "name": "ITlusions",
+        "url": "https://itlusions.com"
+      },
+      "email": "{{ site.author.email }}",
+      "sameAs": [
+        "{{ site.author.linkedin }}",
+        "{{ site.author.github }}",
+        "{{ site.author.company }}"
+      ],
+      "knowsAbout": [
+        "DevOps", "Cloud Architecture", "Kubernetes", "Azure", "GitOps", 
+        "Infrastructure as Code", "Cloud-Native Solutions", "DevSecOps",
+        "Container Orchestration", "CI/CD Pipelines", "DNS Management", "Network Security"
+      ],
+      "description": "{{ site.description }}",
+      "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "{{ site.url }}{{ page.url | default: '/' }}"
+      }
+    }
+    </script>
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">

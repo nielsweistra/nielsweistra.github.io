@@ -3,7 +3,21 @@ layout: post
 title: "External DNS with CoreDNS: Static and Dynamic Zones in Kubernetes"
 date: 2025-10-05 19:00:00 +0200
 categories: kubernetes dns coredns networking
-tags: [kubernetes, dns, coredns, networking, devops, infrastructure]
+tags: [kubernetes, dns, coredns, networking, devops, infrastructure, metallb, loadbalancer]
+excerpt: "Learn how to set up external DNS access using CoreDNS in Kubernetes with both static and dynamic DNS zones. Complete guide including volume mounts, ConfigMaps, and LoadBalancer configuration."
+description: "Complete tutorial on implementing external DNS with CoreDNS in Kubernetes. Covers static zones for infrastructure services, dynamic zones for applications, proper volume mounting, and MetalLB LoadBalancer setup."
+image: /assets/images/coredns-kubernetes-dns.png
+author: "Niels Weistra"
+seo:
+  type: BlogPosting
+  headline: "External DNS with CoreDNS: Static and Dynamic Zones in Kubernetes"
+  description: "Step-by-step guide to implementing external DNS access using CoreDNS in Kubernetes with static and dynamic zones, volume mounts, and LoadBalancer configuration"
+  datePublished: "2025-10-05T19:00:00+02:00"
+  dateModified: "2025-10-05T19:00:00+02:00"
+  author:
+    type: Person
+    name: "Niels Weistra"
+    url: "https://nielsweistra.github.io"
 ---
 
 In this post, I'll walk you through setting up external DNS access using CoreDNS in Kubernetes with both static and dynamic DNS zones. This setup allows you to expose your internal services via custom domain names that can be resolved from outside your cluster.

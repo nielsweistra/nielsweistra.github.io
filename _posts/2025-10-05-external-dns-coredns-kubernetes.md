@@ -416,5 +416,3 @@ Your DNS infrastructure is now ready to serve both static infrastructure records
 > In a future post, I'll dive deeper into managing and automating the dynamic DNS zone, including practical scripts and workflows for updating records.
 
 ---
-
-*Tags: kubernetes, dns, coredns, networking, devops, infrastructure, metallb, loadbalancer*

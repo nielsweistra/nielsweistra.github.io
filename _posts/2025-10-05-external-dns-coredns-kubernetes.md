@@ -6,8 +6,6 @@ categories: kubernetes dns coredns networking
 tags: [kubernetes, dns, coredns, networking, devops, infrastructure]
 ---
 
-# External DNS with CoreDNS: Static and Dynamic Zones in Kubernetes
-
 In this post, I'll walk you through setting up external DNS access using CoreDNS in Kubernetes with both static and dynamic DNS zones. This setup allows you to expose your internal services via custom domain names that can be resolved from outside your cluster.
 
 ## 🎯 Overview

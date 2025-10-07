@@ -5,6 +5,9 @@ description: "Expert DevOps Engineer and Cloud Architect specializing in Kuberne
 baseurl: ""
 url: "https://nielsweistra.github.io"
 
+# Production settings
+JEKYLL_ENV: production
+
 # Author
 author:
   name: "Niels Weistra"

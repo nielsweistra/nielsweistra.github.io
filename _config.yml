@@ -49,9 +49,11 @@ social:
 # Plugins
 plugins:
   - jekyll-paginate
-  - jekyll-sitemap
   - jekyll-seo-tag
   - jekyll-feed
+
+# Disable conflicting sitemap plugin
+# - jekyll-sitemap
 
 # Plugin settings for production builds
 jekyll-sitemap:
@@ -77,6 +79,11 @@ exclude:
   - start-dev.bat
   - start-dev.sh
   - DEVELOPMENT.md
+  - sitemap-manual.xml
+
+# Keep sitemap.xml for static serving
+keep_files:
+  - sitemap.xml
 
 # Defaults
 defaults:

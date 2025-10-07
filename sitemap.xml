@@ -1,7 +1,3 @@
----
-layout: null
-sitemap: false
----
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -10,46 +6,54 @@ sitemap: false
 
   <!-- Homepage -->
   <url>
-    <loc>{{ site.url }}/</loc>
-    <lastmod>{{ site.time | date_to_xmlschema }}</lastmod>
+    <loc>https://nielsweistra.github.io/</loc>
+    <lastmod>2025-10-07T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
 
   <!-- Blog index -->
   <url>
-    <loc>{{ site.url }}/blog/</loc>
-    <lastmod>{{ site.time | date_to_xmlschema }}</lastmod>
+    <loc>https://nielsweistra.github.io/blog/</loc>
+    <lastmod>2025-10-07T00:00:00+00:00</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <!-- Blog posts -->
-  {% for post in site.posts %}
   <url>
-    <loc>{{ site.url }}{{ post.url }}</loc>
-    <lastmod>{{ post.date | date_to_xmlschema }}</lastmod>
+    <loc>https://nielsweistra.github.io/blog/2025/03/26/iops-cluster-sizes-filesystems/</loc>
+    <lastmod>2025-03-26T00:00:00+00:00</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
-  {% endfor %}
 
-  <!-- Static pages -->
-  {% for page in site.pages %}
-    {% unless page.sitemap == false or page.url contains 'feed' or page.url contains '404' %}
-      {% if page.url != '/robots.txt' and page.url != '/sitemap.xml' %}
-      <url>
-        <loc>{{ site.url }}{{ page.url | remove: 'index.html' }}</loc>
-        {% if page.date %}
-          <lastmod>{{ page.date | date_to_xmlschema }}</lastmod>
-        {% else %}
-          <lastmod>{{ site.time | date_to_xmlschema }}</lastmod>
-        {% endif %}
-        <changefreq>monthly</changefreq>
-        <priority>0.6</priority>
-      </url>
-      {% endif %}
-    {% endunless %}
-  {% endfor %}
+  <url>
+    <loc>https://nielsweistra.github.io/blog/2025/09/28/kubernetes-platforms-comparison/</loc>
+    <lastmod>2025-09-28T00:00:00+00:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://nielsweistra.github.io/blog/2025/09/28/vcluster-demo-tutorial/</loc>
+    <lastmod>2025-09-28T00:00:00+00:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://nielsweistra.github.io/blog/2025/10/03/terraform-entra-domain-services/</loc>
+    <lastmod>2025-10-03T00:00:00+00:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://nielsweistra.github.io/blog/2025/10/05/external-dns-coredns-kubernetes/</loc>
+    <lastmod>2025-10-05T00:00:00+00:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
 
 </urlset>

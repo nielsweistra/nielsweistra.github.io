@@ -46,12 +46,17 @@ social:
 # Plugins
 plugins:
   - jekyll-paginate
+  - jekyll-sitemap
   - jekyll-seo-tag
   - jekyll-feed
 
-# Plugin settings (jekyll-sitemap disabled in favor of custom sitemap.xml)
-# sitemap:
-#   file: "/sitemap.xml"
+# Plugin settings for production builds
+jekyll-sitemap:
+  priority: 1.0
+  changefreq: 'daily'
+  exclude:
+    - "/404.html"
+    - "/feed.xml"
 
 # Exclude from processing
 exclude:

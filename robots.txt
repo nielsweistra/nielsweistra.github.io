@@ -1,10 +1,11 @@
 User-agent: *
 Allow: /
 
-# Sitemap location
+# Sitemap and feed locations
 Sitemap: https://nielsweistra.github.io/sitemap.xml
+# RSS Feed: https://nielsweistra.github.io/feed.xml
 
-# Specific bot permissions
+# Specific bot permissions for major search engines
 User-agent: Googlebot
 Allow: /
 
@@ -23,5 +24,8 @@ Allow: /
 # Crawl-delay for polite crawling
 Crawl-delay: 1
 
-# Exclude any files you don't want indexed (none in this case)
-# Disallow: /private/
+# Exclude development and system files
+Disallow: /_site/
+Disallow: /.git/
+Disallow: /vendor/
+Disallow: /node_modules/

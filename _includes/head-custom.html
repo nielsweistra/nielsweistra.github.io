@@ -1,0 +1,41 @@
+<!-- Custom head content -->
+<!-- This file is included by the default Jekyll theme -->
+
+<!-- Additional meta tags for better SEO -->
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+<meta name="googlebot" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+
+<!-- Canonical URL -->
+<link rel="canonical" href="{{ site.url }}{{ page.url | default: '/' }}">
+
+<!-- Additional structured data for blog posts -->
+{% if page.layout == 'post' %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "{{ page.title }}",
+  "description": "{{ page.excerpt | strip_html | strip_newlines | truncate: 160 }}",
+  "image": "{{ site.url }}{{ page.image | default: '/assets/images/default-blog.png' }}",
+  "author": {
+    "@type": "Person",
+    "name": "{{ site.author.name }}",
+    "url": "{{ site.url }}"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "{{ site.title }}",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "{{ site.url }}/assets/images/logo.png"
+    }
+  },
+  "datePublished": "{{ page.date | date_to_xmlschema }}",
+  "dateModified": "{{ page.date | date_to_xmlschema }}",
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "{{ site.url }}{{ page.url }}"
+  }
+}
+</script>
+{% endif %}

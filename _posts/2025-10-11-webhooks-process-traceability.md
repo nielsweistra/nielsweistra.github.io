@@ -6,12 +6,12 @@ categories: [DevOps, Automation]
 tags: [webhooks, traceability, monitoring, ci-cd, teams, notifications]
 excerpt: "Turn your deployment pipeline into a traceable audit trail with smart webhook notifications that land right where your team works."
 description: "Learn how to implement webhooks for complete process traceability in your DevOps pipeline, from build to production with Microsoft Teams integration."
-image: "/assets/webhook-traceability.svg"
+image: "/assets/vscode-development-screenshot.jpg"
 author: "Niels Weistra"
 ---
 
-![Webhook Process Traceability](/assets/webhook-traceability.svg)
-*Real-time deployment tracking with webhook notifications in Microsoft Teams*
+![Webhook Process Traceability](/assets/vscode-development-screenshot.jpg)
+*Real development environment showing webhook implementation and infrastructure monitoring*
 
 Your deployments shouldn't disappear into the void. When code ships, services restart, or infrastructure changes, your team needs **complete visibility** right where they're already collaborating—and you need an audit trail that survives compliance reviews.
 

@@ -10,7 +10,7 @@ image: "/assets/vscode-development-screenshot.jpg"
 author: "Niels Weistra"
 ---
 
-![Webhook Process Traceability](/assets/vscode-development-screenshot.jpg)
+<img src="/assets/vscode-development-screenshot.jpg" alt="Webhook Process Traceability" style="width: 60%; height: auto; display: block; margin: 0 auto;">
 *Real development environment showing webhook implementation and infrastructure monitoring*
 
 Your deployments shouldn't disappear into the void. When code ships, services restart, or infrastructure changes, your team needs **complete visibility** right where they're already collaborating—and you need an audit trail that survives compliance reviews.

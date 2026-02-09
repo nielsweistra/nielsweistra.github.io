@@ -243,9 +243,9 @@ This is alpha. **Baby wolf**. Here's what's coming:
 
 **Networking:**
 - VNet provider — virtual networks with subnet CIDR management
-- **Cilium** — eBPF-based CNI for high-performance networking and native network policies
-- **Multus** — multi-network attachment for pods connecting to tenant VNets
-- **Hubble** — network observability and flow visibility built on Cilium
+- Cilium — eBPF-based CNI for high-performance networking and native network policies
+- Multus — multi-network attachment for pods connecting to tenant VNets
+- Hubble — network observability and flow visibility built on Cilium
 - Tunnel provider — WireGuard mesh for secure site-to-site
 - ZTNA tunnels — Zero Trust Network Access with SPIRE/SPIFFE for workload identity
 - DNS provider — CoreDNS or PowerDNS with zone delegation per tenant

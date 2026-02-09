@@ -186,11 +186,11 @@ The platform itself runs as a Docker Compose stack (for local development) or Ku
 
 | Provider | Status | What It Does |
 |----------|--------|-------------|
-| **Core Provider** | ✅ Working | Tenants, management groups, subscriptions, resource groups, locations |
-| **IAM Provider** | 🚧 In Progress | Keycloak integration — realms, users, groups, roles, service accounts |
-| **Compute Provider** | 📋 Planned | VM lifecycle via Proxmox/libvirt, container orchestration |
-| **Network Provider** | 📋 Planned | VNets, subnets, tunnels (WireGuard), DNS zones |
-| **Storage Provider** | 📋 Planned | Block storage, object storage (MinIO), file shares |
+| **Core Provider** | Working | Tenants, management groups, subscriptions, resource groups, locations |
+| **IAM Provider** | In Progress | Keycloak integration — realms, users, groups, roles, service accounts |
+| **Compute Provider** | Planned | VM lifecycle via Proxmox/libvirt, container orchestration |
+| **Network Provider** | Planned | VNets, subnets, tunnels (WireGuard), DNS zones |
+| **Storage Provider** | Planned | Block storage, object storage (MinIO), file shares |
 
 ## The CLI: `itlcp`
 
@@ -224,49 +224,49 @@ This is alpha. **Baby wolf**. Here's what's coming:
 ### Phase 1: Core Platform
 
 **Identity & Access:**
-- [ ] IAM Provider with full Keycloak integration
-- [ ] Service accounts with managed credentials (like Azure Managed Identities)
-- [ ] PIM-style privileged access — time-bound role elevations with approval workflows
-- [ ] RBAC at every scope level (tenant, management group, subscription, resource group)
+- IAM Provider with full Keycloak integration
+- Service accounts with managed credentials (like Azure Managed Identities)
+- PIM-style privileged access — time-bound role elevations with approval workflows
+- RBAC at every scope level (tenant, management group, subscription, resource group)
 
 **Governance:**
-- [ ] Policy engine — deny certain resource types, enforce naming conventions, require tags
-- [ ] Cost tracking — resource metering, subscription budgets, alerts
-- [ ] Compliance reports — who did what, when, exportable audit trails
+- Policy engine — deny certain resource types, enforce naming conventions, require tags
+- Cost tracking — resource metering, subscription budgets, alerts
+- Compliance reports — who did what, when, exportable audit trails
 
 ### Phase 2: Infrastructure Providers
 
 **Compute:**
-- [ ] VM Provider via Proxmox VE (KVM-based, REST API)
-- [ ] Container workloads via Kubernetes (vCluster for tenant isolation)
-- [ ] Serverless functions (OpenFaaS or Knative)
+- VM Provider via Proxmox VE (KVM-based, REST API)
+- Container workloads via Kubernetes (vCluster for tenant isolation)
+- Serverless functions (OpenFaaS or Knative)
 
 **Networking:**
-- [ ] VNet provider — virtual networks with subnet CIDR management
-- [ ] Tunnel provider — WireGuard mesh for secure site-to-site
-- [ ] ZTNA tunnels — Zero Trust Network Access with SPIRE/SPIFFE for workload identity
-- [ ] DNS provider — CoreDNS or PowerDNS with zone delegation per tenant
-- [ ] Load balancers — HAProxy or Envoy with config-as-resource
+- VNet provider — virtual networks with subnet CIDR management
+- Tunnel provider — WireGuard mesh for secure site-to-site
+- ZTNA tunnels — Zero Trust Network Access with SPIRE/SPIFFE for workload identity
+- DNS provider — CoreDNS or PowerDNS with zone delegation per tenant
+- Load balancers — HAProxy or Envoy with config-as-resource
 
 > **Why SPIRE/SPIFFE?** Traditional VPNs trust the network perimeter. Zero Trust says "never trust, always verify" — every workload gets a cryptographic identity (SPIFFE ID), and connections are authenticated at the workload level, not the network level. SPIRE issues and rotates these identities automatically. Combined with mTLS, you get encrypted, identity-verified communication between services without managing certificates manually.
 
 **Storage:**
-- [ ] Block storage via Ceph or local LVM
-- [ ] Object storage via MinIO (S3-compatible)
-- [ ] File shares via NFS or SMB with access policies
+- Block storage via Ceph or local LVM
+- Object storage via MinIO (S3-compatible)
+- File shares via NFS or SMB with access policies
 
 ### Phase 3: Enterprise Features
 
 **Multi-Cloud Bridge:**
-- [ ] Azure Resource Provider — manage Azure resources through ITL Control Plane
-- [ ] AWS Resource Provider — same abstraction, different cloud
-- [ ] Hybrid policies — "this workload runs on-prem, that one in Azure"
+- Azure Resource Provider — manage Azure resources through ITL Control Plane
+- AWS Resource Provider — same abstraction, different cloud
+- Hybrid policies — "this workload runs on-prem, that one in Azure"
 
 **Developer Experience:**
-- [ ] Terraform provider — `terraform apply` against ITL Control Plane
-- [ ] Pulumi provider — same, but TypeScript/Python/Go native
-- [ ] GitOps — resource definitions in Git, auto-reconciled
-- [ ] Self-service portal — tenant admins manage their own subscriptions
+- Terraform provider — `terraform apply` against ITL Control Plane
+- Pulumi provider — same, but TypeScript/Python/Go native
+- GitOps — resource definitions in Git, auto-reconciled
+- Self-service portal — tenant admins manage their own subscriptions
 
 ### Infrastructure as Code Vision
 
@@ -309,9 +309,9 @@ vm = itl.VirtualMachine("web-01", resource_group=rg, size="Standard_D2s")
 Both approaches work. Terraform is widely adopted and declarative. Pulumi gives you loops, conditionals, type safety, and IDE autocomplete — real programming instead of a DSL. Pick your poison.
 
 **Operations:**
-- [ ] Helm charts for production Kubernetes deployment
-- [ ] Prometheus/Grafana integration for platform observability
-- [ ] Disaster recovery — backup/restore of control plane state
+- Helm charts for production Kubernetes deployment
+- Prometheus/Grafana integration for platform observability
+- Disaster recovery — backup/restore of control plane state
 
 ## Why Build This?
 

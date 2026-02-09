@@ -961,23 +961,19 @@
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       
-      function loadGoogleAnalytics() {
-        if (document.getElementById('ga-script')) return;
+      // Load GA for returning visitors who already accepted
+      if (localStorage.getItem('cookie-consent') === 'accepted') {
         var script = document.createElement('script');
-        script.id = 'ga-script';
         script.async = true;
         script.src = 'https://www.googletagmanager.com/gtag/js?id=G-B199EDTC2Z';
+        script.onload = function() {
+          gtag('js', new Date());
+          gtag('config', 'G-B199EDTC2Z', {
+            'send_page_view': true,
+            'anonymize_ip': true
+          });
+        };
         document.head.appendChild(script);
-        gtag('js', new Date());
-        gtag('config', 'G-B199EDTC2Z', {
-          'send_page_view': true,
-          'anonymize_ip': true
-        });
-      }
-      
-      // Check for existing consent
-      if (localStorage.getItem('cookie-consent') === 'accepted') {
-        loadGoogleAnalytics();
       }
     </script>
     
@@ -1153,30 +1149,41 @@
     </div>
     
     <script>
-        // Cookie Consent Management - Only show if GA is available
+        // Cookie Consent Management - Only show if GA is reachable
+        var gaLoaded = false;
+        var gaScript = null;
+        
         (function() {
             var consent = localStorage.getItem('cookie-consent');
-            if (consent) return; // Already decided
+            if (consent) return; // Already decided, don't check GA
             
-            // Test if Google Analytics can be loaded before showing consent
-            var testScript = document.createElement('script');
-            testScript.src = 'https://www.googletagmanager.com/gtag/js?id=G-B199EDTC2Z';
-            testScript.async = true;
-            testScript.onload = function() {
-                // GA is available, show consent banner
+            // Try to load GA with a timeout
+            gaScript = document.createElement('script');
+            gaScript.src = 'https://www.googletagmanager.com/gtag/js?id=G-B199EDTC2Z';
+            gaScript.async = true;
+            
+            var timeout = setTimeout(function() {
+                // Timeout reached - GA is likely blocked (Pi-hole, ad blocker)
+                if (!gaLoaded) {
+                    console.log('Analytics blocked or timed out, hiding consent banner');
+                    if (gaScript.parentNode) gaScript.parentNode.removeChild(gaScript);
+                }
+            }, 2000);
+            
+            gaScript.onload = function() {
+                gaLoaded = true;
+                clearTimeout(timeout);
+                // GA loaded successfully, show consent banner
                 document.getElementById('cookieConsent').classList.add('show');
             };
-            testScript.onerror = function() {
-                // GA blocked (ad blocker), don't show consent banner
-                console.log('Analytics blocked, skipping consent banner');
-            };
-            document.head.appendChild(testScript);
+            
+            document.head.appendChild(gaScript);
         })();
         
         function acceptCookies() {
             localStorage.setItem('cookie-consent', 'accepted');
             document.getElementById('cookieConsent').classList.remove('show');
-            // GA script already loaded from test, just initialize
+            // GA script already loaded, just initialize
             gtag('js', new Date());
             gtag('config', 'G-B199EDTC2Z', {
                 'send_page_view': true,
@@ -1187,6 +1194,8 @@
         function declineCookies() {
             localStorage.setItem('cookie-consent', 'declined');
             document.getElementById('cookieConsent').classList.remove('show');
+            // Remove GA script since user declined
+            if (gaScript && gaScript.parentNode) gaScript.parentNode.removeChild(gaScript);
         }
     </script>
 </body>

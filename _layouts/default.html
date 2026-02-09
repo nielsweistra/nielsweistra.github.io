@@ -1153,18 +1153,35 @@
     </div>
     
     <script>
-        // Cookie Consent Management
+        // Cookie Consent Management - Only show if GA is available
         (function() {
             var consent = localStorage.getItem('cookie-consent');
-            if (!consent) {
+            if (consent) return; // Already decided
+            
+            // Test if Google Analytics can be loaded before showing consent
+            var testScript = document.createElement('script');
+            testScript.src = 'https://www.googletagmanager.com/gtag/js?id=G-B199EDTC2Z';
+            testScript.async = true;
+            testScript.onload = function() {
+                // GA is available, show consent banner
                 document.getElementById('cookieConsent').classList.add('show');
-            }
+            };
+            testScript.onerror = function() {
+                // GA blocked (ad blocker), don't show consent banner
+                console.log('Analytics blocked, skipping consent banner');
+            };
+            document.head.appendChild(testScript);
         })();
         
         function acceptCookies() {
             localStorage.setItem('cookie-consent', 'accepted');
             document.getElementById('cookieConsent').classList.remove('show');
-            loadGoogleAnalytics();
+            // GA script already loaded from test, just initialize
+            gtag('js', new Date());
+            gtag('config', 'G-B199EDTC2Z', {
+                'send_page_view': true,
+                'anonymize_ip': true
+            });
         }
         
         function declineCookies() {

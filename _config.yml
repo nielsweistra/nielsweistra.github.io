@@ -22,6 +22,7 @@ highlighter: rouge
 paginate: 6
 paginate_path: "/blog/page:num/"
 theme: minima
+future: true
 
 # Collections
 collections:

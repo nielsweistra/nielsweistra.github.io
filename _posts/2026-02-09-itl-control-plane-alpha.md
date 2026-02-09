@@ -3,7 +3,7 @@ layout: post
 title: "Building Your Own Cloud: ITL Control Plane Alpha"
 date: 2026-02-09 10:00:00 +0200
 categories: [Cloud, Architecture]
-tags: [control-plane, azure-resource-manager, multi-cloud, python, fastapi, neo4j]
+tags: [control-plane, azure-resource-manager, multi-cloud, python, fastapi, neo4j, cilium, multus, hubble, kubernetes-networking]
 excerpt: "Introducing the ITL Control Plane — a baby wolf taking its first steps in building a proper cloud abstraction layer before touching any servers."
 description: "A first look at the ITL Control Plane alpha: multi-tenant resource management inspired by Azure Resource Manager, built with Python, Neo4j, and a focus on getting the abstraction right first."
 image: "/assets/itl-dashboard-all-resources.png"
@@ -243,10 +243,15 @@ This is alpha. **Baby wolf**. Here's what's coming:
 
 **Networking:**
 - VNet provider — virtual networks with subnet CIDR management
+- **Cilium** — eBPF-based CNI for high-performance networking and native network policies
+- **Multus** — multi-network attachment for pods connecting to tenant VNets
+- **Hubble** — network observability and flow visibility built on Cilium
 - Tunnel provider — WireGuard mesh for secure site-to-site
 - ZTNA tunnels — Zero Trust Network Access with SPIRE/SPIFFE for workload identity
 - DNS provider — CoreDNS or PowerDNS with zone delegation per tenant
 - Load balancers — HAProxy or Envoy with config-as-resource
+
+> **Why Cilium + Multus + Hubble?** Traditional Kubernetes networking gives you one flat network. For a multi-tenant cloud, you need proper VNet isolation. **Cilium** uses eBPF for kernel-level packet processing — faster than iptables, with L7-aware policies (filter by HTTP path, gRPC method). **Multus** lets pods attach to multiple networks — a pod can have its management interface on the cluster network and a data interface on a tenant-specific VNet. **Hubble** gives you real-time visibility into all network flows without sampling — you can see exactly which services are talking to each other, with latency metrics and HTTP status codes. Together, they form the foundation for Azure-style VNet isolation on Kubernetes.
 
 > **Why SPIRE/SPIFFE?** Traditional VPNs trust the network perimeter. Zero Trust says "never trust, always verify" — every workload gets a cryptographic identity (SPIFFE ID), and connections are authenticated at the workload level, not the network level. SPIRE issues and rotates these identities automatically. Combined with mTLS, you get encrypted, identity-verified communication between services without managing certificates manually.
 

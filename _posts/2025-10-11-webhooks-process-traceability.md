@@ -57,13 +57,13 @@ jobs:
         id: version
         run: echo "version=$(date +%Y%m%d)-${GITHUB_SHA::8}" >> $GITHUB_OUTPUT
       
-      - name: 📢 Deployment Started
+      - name: Deployment Started
         run: |
           curl -X POST -H 'Content-Type: application/json' \
             -d '{
               "@type": "MessageCard",
               "themeColor": "0078D4",
-              "title": "🚀 Deployment Started",
+              "title": "Deployment Started",
               "sections": [{
                 "facts": [
                   {"name": "Service", "value": "${{ github.repository }}"},
@@ -91,13 +91,13 @@ jobs:
       STATUS: ${{ contains(join(needs.*.result, ','), 'failure') && 'FAILED' || 'SUCCESS' }}
       COLOR: ${{ contains(join(needs.*.result, ','), 'failure') && 'D00000' || '2EB886' }}
     steps:
-      - name: 📋 Deployment Result
+      - name: Deployment Result
         run: |
           curl -X POST -H 'Content-Type: application/json' \
             -d '{
               "@type": "MessageCard",
               "themeColor": "${{ env.COLOR }}",
-              "title": "📋 Deployment ${{ env.STATUS }}",
+              "title": "Deployment ${{ env.STATUS }}",
               "sections": [{
                 "facts": [
                   {"name": "Service", "value": "${{ github.repository }}"},
@@ -146,7 +146,7 @@ For Terraform or Kubernetes deployments, include infrastructure change context:
 curl -X POST -H 'Content-Type: application/json' \
   -d "{
     \"@type\": \"MessageCard\",
-    \"title\": \"🏗️ Infrastructure Change Applied\",
+    \"title\": \"Infrastructure Change Applied\",
     \"sections\": [{
       \"facts\": [
         {\"name\": \"Environment\", \"value\": \"${TF_WORKSPACE}\"},

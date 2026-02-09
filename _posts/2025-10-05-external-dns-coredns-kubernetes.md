@@ -22,7 +22,7 @@ seo:
 
 In this post, I'll walk you through setting up external DNS access using CoreDNS in Kubernetes with both static and dynamic DNS zones. This setup allows you to expose your internal services via custom domain names that can be resolved from outside your cluster.
 
-## 🎯 Overview
+## Overview
 
 We'll create:
 - **Static DNS zone**: `int.itlusions.com` for infrastructure services
@@ -30,7 +30,7 @@ We'll create:
 - **External access**: Via MetalLB LoadBalancer
 - **Volume mounts**: Proper ConfigMap mounting for zone files
 
-## 🏗️ Architecture
+## Architecture
 
 ```
 External Clients
@@ -44,13 +44,13 @@ External Clients
    └── Dynamic: dyn.int.itlusions.com
 ```
 
-## 📋 Prerequisites
+## Prerequisites
 
 - Kubernetes cluster with CoreDNS
 - MetalLB or similar LoadBalancer implementation
 - kubectl access with cluster-admin permissions
 
-## 🔧 Step 1: MetalLB IP Pool Configuration
+## Step 1: MetalLB IP Pool Configuration
 
 First, create a dedicated IP pool for DNS services:
 
@@ -78,7 +78,7 @@ spec:
       kubernetes.io/os: linux
 ```
 
-## 🗂️ Step 2: Static Zone Configuration
+## Step 2: Static Zone Configuration
 
 Create the static zone for your infrastructure services:
 
@@ -140,7 +140,7 @@ data:
     *.test          IN      A       10.96.7.100
 ```
 
-## ⚡ Step 3: Dynamic Zone Configuration
+## Step 3: Dynamic Zone Configuration
 
 Create the dynamic zone with proper SOA record:
 
@@ -173,7 +173,7 @@ data:
     ; Dynamic records will be added here automatically
 ```
 
-## 🌐 Step 4: External Access LoadBalancer
+## Step 4: External Access LoadBalancer
 
 Create a LoadBalancer service to expose CoreDNS externally:
 
@@ -210,7 +210,7 @@ spec:
     targetPort: 53
 ```
 
-## 🔧 Step 5: CoreDNS Configuration
+## Step 5: CoreDNS Configuration
 
 Update the CoreDNS configuration to include your custom zones:
 
@@ -263,7 +263,7 @@ data:
     }
 ```
 
-## 📁 Step 6: CoreDNS Deployment Volume Mounts
+## Step 6: CoreDNS Deployment Volume Mounts
 
 The crucial part is properly mounting the ConfigMaps as volumes in CoreDNS pods:
 
@@ -306,7 +306,7 @@ spec:
           defaultMode: 0644
 ```
 
-## 🚀 Step 7: Deployment Commands
+## Step 7: Deployment Commands
 
 Deploy everything in the correct order:
 
@@ -331,7 +331,7 @@ kubectl apply -f coredns-external-service.yaml
 kubectl rollout restart deployment/coredns -n kube-system
 ```
 
-## 🧪 Step 8: Testing
+## Step 8: Testing
 
 Test your DNS setup:
 
@@ -355,7 +355,7 @@ Name:   k8s-api.int.itlusions.com
 Address: 10.96.0.1
 ```
 
-## 🔍 Troubleshooting
+## Troubleshooting
 
 ### Volume Mount Issues
 - Ensure ConfigMaps exist before patching deployment
@@ -376,7 +376,7 @@ kubectl get configmap coredns-custom-zones -n kube-system -o yaml
 - Check MetalLB logs
 - Test internal resolution first
 
-## 📊 Key Configuration Points
+## Key Configuration Points
 
 ### Volume Mounts Explained
 
@@ -397,7 +397,7 @@ kubectl get configmap coredns-custom-zones -n kube-system -o yaml
 - **auto**: For dynamic zones with automatic reload
 - **reload**: Monitors file changes for updates
 
-## 🎯 Best Practices
+## Best Practices
 
 1. **Use separate ConfigMaps** for static and dynamic zones
 2. **Set appropriate TTL values** (low for dynamic, higher for static)
@@ -405,7 +405,7 @@ kubectl get configmap coredns-custom-zones -n kube-system -o yaml
 4. **Use descriptive resource labels** for easier management
 5. **Implement proper RBAC** for zone management scripts
 
-## 🔄 Dynamic Zone Management
+## Dynamic Zone Management
 
 For dynamic zones, you can create management scripts that update the ConfigMap:
 
@@ -416,14 +416,14 @@ echo "myapp    IN    A    10.96.10.100" >> temp-zone.txt
 kubectl create configmap coredns-dynamic-zones --from-file=db.dyn.int.itlusions.com=temp-zone.txt --dry-run=client -o yaml | kubectl replace -f -
 ```
 
-## 🎉 You reached the finishline!
+## You reached the finishline!
 
 This setup provides you with:
-- ✅ External DNS access via LoadBalancer
-- ✅ Static zone for infrastructure services
-- ✅ Dynamic zone for application services
-- ✅ Proper volume mounting and configuration
-- ✅ Automatic zone reloading
+- External DNS access via LoadBalancer
+- Static zone for infrastructure services
+- Dynamic zone for application services
+- Proper volume mounting and configuration
+- Automatic zone reloading
 
 Your DNS infrastructure is now ready to serve both static infrastructure records and dynamically managed application records, accessible from external networks!
 

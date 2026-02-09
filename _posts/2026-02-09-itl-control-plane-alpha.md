@@ -341,12 +341,6 @@ But I also saw enterprise after enterprise struggle with common problems:
 
 A proper control plane solves these problems **before** you have them. The abstraction layer isn't overhead — it's the foundation everything else builds on.
 
-## Built with AI
-
-This project is being built in collaboration with **GitHub Copilot** (Claude). Not just autocomplete — actual pair programming on architecture decisions, SDK design, API contracts, and this very blog post. It's an experiment in how far you can push AI-assisted development on a non-trivial, multi-service platform.
-
-The conversation history, the architectural debates, the "wait, that pattern doesn't scale" moments — they're all happening in real-time with an AI that understands the codebase across all repositories. It's a different way of building software, and so far, it's working.
-
 ## Try It Yourself
 
 The codebase is spread across several repositories (it's a microservices architecture, after all):

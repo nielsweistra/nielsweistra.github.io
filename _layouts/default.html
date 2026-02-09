@@ -956,17 +956,89 @@
         }
     </style>
     
-    <!-- Google Analytics 4 -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-B199EDTC2Z"></script>
+    <!-- Google Analytics 4 - Loaded after consent -->
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-B199EDTC2Z', {
-        'send_page_view': true,
-        'anonymize_ip': true
-      });
+      
+      function loadGoogleAnalytics() {
+        if (document.getElementById('ga-script')) return;
+        var script = document.createElement('script');
+        script.id = 'ga-script';
+        script.async = true;
+        script.src = 'https://www.googletagmanager.com/gtag/js?id=G-B199EDTC2Z';
+        document.head.appendChild(script);
+        gtag('js', new Date());
+        gtag('config', 'G-B199EDTC2Z', {
+          'send_page_view': true,
+          'anonymize_ip': true
+        });
+      }
+      
+      // Check for existing consent
+      if (localStorage.getItem('cookie-consent') === 'accepted') {
+        loadGoogleAnalytics();
+      }
     </script>
+    
+    <!-- Cookie Consent Banner Styles -->
+    <style>
+      .cookie-consent {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(0, 0, 0, 0.95);
+        color: #fff;
+        padding: 1rem 2rem;
+        z-index: 9999;
+        display: none;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 1rem;
+        box-shadow: 0 -4px 20px rgba(0,0,0,0.3);
+      }
+      .cookie-consent.show { display: flex; }
+      .cookie-consent p {
+        margin: 0;
+        flex: 1;
+        min-width: 300px;
+        font-size: 0.9rem;
+        line-height: 1.5;
+      }
+      .cookie-consent a { color: var(--accent-color); }
+      .cookie-consent-buttons {
+        display: flex;
+        gap: 0.75rem;
+        flex-shrink: 0;
+      }
+      .cookie-consent-buttons button {
+        padding: 0.6rem 1.25rem;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: 500;
+        font-size: 0.9rem;
+        transition: all 0.2s;
+      }
+      .cookie-accept {
+        background: var(--accent-color);
+        color: #000;
+      }
+      .cookie-accept:hover { background: #e6b047; }
+      .cookie-decline {
+        background: transparent;
+        color: #fff;
+        border: 1px solid rgba(255,255,255,0.3) !important;
+      }
+      .cookie-decline:hover { border-color: #fff !important; }
+      @media (max-width: 600px) {
+        .cookie-consent { padding: 1rem; }
+        .cookie-consent p { min-width: 100%; text-align: center; }
+        .cookie-consent-buttons { width: 100%; justify-content: center; }
+      }
+    </style>
 </head>
 <body>
     <!-- Fixed Header - ITlusions Style -->
@@ -1065,6 +1137,40 @@
             element.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
             observer.observe(element);
         });
+    </script>
+    
+    <!-- Cookie Consent Banner -->
+    <div class="cookie-consent" id="cookieConsent">
+        <p>
+            This site uses cookies for analytics to improve your experience. 
+            We use Google Analytics with IP anonymization. 
+            <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Learn more</a>
+        </p>
+        <div class="cookie-consent-buttons">
+            <button class="cookie-decline" onclick="declineCookies()">Decline</button>
+            <button class="cookie-accept" onclick="acceptCookies()">Accept</button>
+        </div>
+    </div>
+    
+    <script>
+        // Cookie Consent Management
+        (function() {
+            var consent = localStorage.getItem('cookie-consent');
+            if (!consent) {
+                document.getElementById('cookieConsent').classList.add('show');
+            }
+        })();
+        
+        function acceptCookies() {
+            localStorage.setItem('cookie-consent', 'accepted');
+            document.getElementById('cookieConsent').classList.remove('show');
+            loadGoogleAnalytics();
+        }
+        
+        function declineCookies() {
+            localStorage.setItem('cookie-consent', 'declined');
+            document.getElementById('cookieConsent').classList.remove('show');
+        }
     </script>
 </body>
 </html>

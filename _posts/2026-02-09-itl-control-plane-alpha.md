@@ -11,7 +11,7 @@ author: "Niels Weistra"
 ---
 
 <div style="width: 100%; height: 200px; overflow: hidden; border-radius: 8px; margin-bottom: 1rem;">
-  <img src="./assets/itl-dashboard-all-resources.png" alt="ITL Control Plane Dashboard" style="width: 100%; height: auto; object-fit: cover; object-position: top;">
+  <img src="/assets/itl-dashboard-all-resources.png" alt="ITL Control Plane Dashboard" style="width: 100%; height: auto; object-fit: cover; object-position: top;">
 </div>
 *ITL Control Plane Dashboard — 374 resources, 6 tenants, all managed through a unified abstraction layer*
 
@@ -77,7 +77,7 @@ Let me show you what's actually functional in this alpha.
 
 The dashboard provides a unified view across all tenants and resource types. Filtering, sorting, export to CSV — the basics that make resource management bearable.
 
-<img src="./assets/itl-dashboard-all-resources.png" alt="All Resources View" style="width: 100%; height: auto; display: block; margin: 0 auto;">
+<img src="/assets/itl-dashboard-all-resources.png" alt="All Resources View" style="width: 100%; height: auto; display: block; margin: 0 auto;">
 *354 resources across 6 tenants, filterable by tenant, location, and type*
 
 Current counts:
@@ -92,7 +92,7 @@ Current counts:
 
 Every resource relationship is stored in Neo4j as a graph. The dashboard includes a D3.js force-directed visualization showing how tenants, management groups, subscriptions, and resource groups connect.
 
-<img src="./assets/itl-resource-graph.png" alt="Resource Graph" style="width: 100%; height: auto; display: block; margin: 0 auto;">
+<img src="/assets/itl-resource-graph.png" alt="Resource Graph" style="width: 100%; height: auto; display: block; margin: 0 auto;">
 *368 nodes, 481 relationships — visualized as an interactive graph*
 
 This isn't just pretty — it's **operational reality**. When you need to understand blast radius ("if I delete this subscription, what resource groups go with it?"), the graph tells you immediately.
@@ -101,31 +101,31 @@ This isn't just pretty — it's **operational reality**. When you need to unders
 
 Every resource operation (CREATE, UPDATE, DELETE) gets logged with full context: who did it, when, what changed, correlation IDs, and response times.
 
-<img src="./assets/itl-activity-logs.png" alt="Activity Logs" style="width: 100%; height: auto; display: block; margin: 0 auto;">
+<img src="/assets/itl-activity-logs.png" alt="Activity Logs" style="width: 100%; height: auto; display: block; margin: 0 auto;">
 *Audit trail showing resource creation events — compliance-ready*
 
 The query editor supports KQL-style queries for filtering logs:
 
-<img src="./assets/itl-kql-query.png" alt="KQL Query Editor" style="width: 100%; height: auto; display: block; margin: 0 auto;">
+<img src="/assets/itl-kql-query.png" alt="KQL Query Editor" style="width: 100%; height: auto; display: block; margin: 0 auto;">
 *Filter logs with KQL: `operation == "CREATE" and tenant == "kadaster"`*
 
 Saved queries and a sample library make common operations repeatable:
 
-<img src="./assets/itl-sample-queries.png" alt="Sample Queries" style="width: 100%; height: auto; display: block; margin: 0 auto;">
+<img src="/assets/itl-sample-queries.png" alt="Sample Queries" style="width: 100%; height: auto; display: block; margin: 0 auto;">
 *Built-in sample queries organized by category*
 
 ### Resource Details
 
 Click any resource to see its full properties, relationships, and actions:
 
-<img src="./assets/itl-resource-detail.png" alt="Resource Detail" style="width: 100%; height: auto; display: block; margin: 0 auto;">
+<img src="/assets/itl-resource-detail.png" alt="Resource Detail" style="width: 100%; height: auto; display: block; margin: 0 auto;">
 *Kadaster tenant detail view with properties and metadata*
 
 ### Infrastructure Monitoring
 
 The platform itself runs as a Docker Compose stack (for local development) or Kubernetes (production). The infra view shows container health and service dependencies:
 
-<img src="./assets/itl-infrastructure.png" alt="Infrastructure View" style="width: 100%; height: auto; display: block; margin: 0 auto;">
+<img src="/assets/itl-infrastructure.png" alt="Infrastructure View" style="width: 100%; height: auto; display: block; margin: 0 auto;">
 *7 containers: API Gateway, Core Provider, Dashboard, Neo4j, PostgreSQL, RabbitMQ, CloudBeaver*
 
 ## The Architecture: Separation of Concerns

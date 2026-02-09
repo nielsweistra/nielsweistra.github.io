@@ -13,9 +13,9 @@ author: "Niels Weistra"
 <div style="width: 100%; height: 200px; overflow: hidden; border-radius: 8px; margin-bottom: 1rem;">
   <img src="/assets/itl-dashboard-all-resources.png" alt="ITL Control Plane Dashboard" style="width: 100%; height: auto; object-fit: cover; object-position: top;">
 </div>
-*ITL Control Plane Dashboard — 374 resources, 6 tenants, all managed through a unified abstraction layer*
+*ITL Control Plane Dashboard showing 374 resources, 6 tenants, all managed through a unified abstraction layer*
 
-This is **alpha**. A baby wolf. A first breath of something that might grow into a full-fledged platform — or crash spectacularly trying. Either way, we're building it in public.
+This is **alpha**. A baby wolf. A first breath of something that might grow into a full-fledged platform, or crash spectacularly trying. Either way, we're building it in public.
 
 The ITL Control Plane is my attempt at solving a problem I've encountered in every enterprise I've worked with: **how do you manage diverse infrastructure without drowning in bespoke scripts and tribal knowledge?**
 
@@ -31,7 +31,7 @@ Before you deploy your first VM, you need answers to:
 - **How do you audit changes?** (Activity logs, compliance trails)
 - **How do you scale governance?** (Policies, management groups, hierarchies)
 
-Azure, AWS, and GCP all solved these problems first. Their control planes — the abstraction layer — came *before* the servers. We're following the same path.
+Azure, AWS, and GCP all solved these problems first. Their control planes (the abstraction layer) came *before* the servers. We're following the same path.
 
 ## The Abstraction Layer: ARM-Style Resource Hierarchy
 
@@ -102,7 +102,7 @@ This isn't just pretty — it's **operational reality**. When you need to unders
 Every resource operation (CREATE, UPDATE, DELETE) gets logged with full context: who did it, when, what changed, correlation IDs, and response times.
 
 <img src="/assets/itl-activity-logs.png" alt="Activity Logs" style="width: 100%; height: auto; display: block; margin: 0 auto;">
-*Audit trail showing resource creation events — compliance-ready*
+*Audit trail showing resource creation events, compliance-ready*
 
 The query editor supports KQL-style queries for filtering logs:
 
@@ -194,7 +194,7 @@ The platform itself runs as a Docker Compose stack (for local development) or Ku
 
 ## The CLI: `itlcp`
 
-Following the same pattern as Azure CLI (`az`), we're building `itlcp` — a command-line interface for managing resources:
+Following the same pattern as Azure CLI (`az`), we're building `itlcp`, a command-line interface for managing resources:
 
 ```bash
 # Authenticate (uses ITLAuth/Keycloak tokens)
@@ -226,13 +226,13 @@ This is alpha. **Baby wolf**. Here's what's coming:
 **Identity & Access:**
 - IAM Provider with full Keycloak integration
 - Service accounts with managed credentials (like Azure Managed Identities)
-- PIM-style privileged access — time-bound role elevations with approval workflows
+- PIM-style privileged access with time-bound role elevations and approval workflows
 - RBAC at every scope level (tenant, management group, subscription, resource group)
 
 **Governance:**
-- Policy engine — deny certain resource types, enforce naming conventions, require tags
-- Cost tracking — resource metering, subscription budgets, alerts
-- Compliance reports — who did what, when, exportable audit trails
+- Policy engine to deny certain resource types, enforce naming conventions, require tags
+- Cost tracking with resource metering, subscription budgets, alerts
+- Compliance reports showing who did what, when, with exportable audit trails
 
 ### Phase 2: Infrastructure Providers
 
@@ -242,18 +242,18 @@ This is alpha. **Baby wolf**. Here's what's coming:
 - Serverless functions (OpenFaaS or Knative)
 
 **Networking:**
-- VNet provider — virtual networks with subnet CIDR management
-- Cilium — eBPF-based CNI for high-performance networking and native network policies
-- Multus — multi-network attachment for pods connecting to tenant VNets
-- Hubble — network observability and flow visibility built on Cilium
-- Tunnel provider — WireGuard mesh for secure site-to-site
-- ZTNA tunnels — Zero Trust Network Access with SPIRE/SPIFFE for workload identity
-- DNS provider — CoreDNS or PowerDNS with zone delegation per tenant
-- Load balancers — HAProxy or Envoy with config-as-resource
+- VNet provider for virtual networks with subnet CIDR management
+- Cilium, an eBPF-based CNI for high-performance networking and native network policies
+- Multus for multi-network attachment, connecting pods to tenant VNets
+- Hubble for network observability and flow visibility built on Cilium
+- Tunnel provider using WireGuard mesh for secure site-to-site connections
+- ZTNA tunnels for Zero Trust Network Access with SPIRE/SPIFFE workload identity
+- DNS provider using CoreDNS or PowerDNS with zone delegation per tenant
+- Load balancers using HAProxy or Envoy with config-as-resource
 
-> **Why Cilium + Multus + Hubble?** Traditional Kubernetes networking gives you one flat network. For a multi-tenant cloud, you need proper VNet isolation. **Cilium** uses eBPF for kernel-level packet processing — faster than iptables, with L7-aware policies (filter by HTTP path, gRPC method). **Multus** lets pods attach to multiple networks — a pod can have its management interface on the cluster network and a data interface on a tenant-specific VNet. **Hubble** gives you real-time visibility into all network flows without sampling — you can see exactly which services are talking to each other, with latency metrics and HTTP status codes. Together, they form the foundation for Azure-style VNet isolation on Kubernetes.
+> **Why Cilium + Multus + Hubble?** Traditional Kubernetes networking gives you one flat network. For a multi-tenant cloud, you need proper VNet isolation. **Cilium** uses eBPF for kernel-level packet processing, faster than iptables, with L7-aware policies (filter by HTTP path, gRPC method). **Multus** lets pods attach to multiple networks. A pod can have its management interface on the cluster network and a data interface on a tenant-specific VNet. **Hubble** gives you real-time visibility into all network flows without sampling, showing exactly which services are talking to each other, with latency metrics and HTTP status codes. Together, they form the foundation for Azure-style VNet isolation on Kubernetes.
 
-> **Why SPIRE/SPIFFE?** Traditional VPNs trust the network perimeter. Zero Trust says "never trust, always verify" — every workload gets a cryptographic identity (SPIFFE ID), and connections are authenticated at the workload level, not the network level. SPIRE issues and rotates these identities automatically. Combined with mTLS, you get encrypted, identity-verified communication between services without managing certificates manually.
+> **Why SPIRE/SPIFFE?** Traditional VPNs trust the network perimeter. Zero Trust says "never trust, always verify": every workload gets a cryptographic identity (SPIFFE ID), and connections are authenticated at the workload level, not the network level. SPIRE issues and rotates these identities automatically. Combined with mTLS, you get encrypted, identity-verified communication between services without managing certificates manually.
 
 **Storage:**
 - Block storage via Ceph or local LVM
@@ -263,19 +263,19 @@ This is alpha. **Baby wolf**. Here's what's coming:
 ### Phase 3: Enterprise Features
 
 **Multi-Cloud Bridge:**
-- Azure Resource Provider — manage Azure resources through ITL Control Plane
-- AWS Resource Provider — same abstraction, different cloud
-- Hybrid policies — "this workload runs on-prem, that one in Azure"
+- Azure Resource Provider to manage Azure resources through ITL Control Plane
+- AWS Resource Provider with the same abstraction, different cloud
+- Hybrid policies like "this workload runs on-prem, that one in Azure"
 
 **Developer Experience:**
-- Terraform provider — `terraform apply` against ITL Control Plane
-- Pulumi provider — same, but TypeScript/Python/Go native
-- GitOps — resource definitions in Git, auto-reconciled
-- Self-service portal — tenant admins manage their own subscriptions
+- Terraform provider for `terraform apply` against ITL Control Plane
+- Pulumi provider, same but TypeScript/Python/Go native
+- GitOps with resource definitions in Git, auto-reconciled
+- Self-service portal where tenant admins manage their own subscriptions
 
 ### Infrastructure as Code Vision
 
-The goal is to manage ITL resources the same way you manage Azure or AWS — declaratively.
+The goal is to manage ITL resources the same way you manage Azure or AWS: declaratively.
 
 **Terraform** (HCL):
 
@@ -300,7 +300,7 @@ resource "itl_virtual_machine" "web" {
 }
 ```
 
-**Pulumi** (Python) — real code, not config:
+**Pulumi** (Python), real code instead of config:
 
 ```python
 import itl_pulumi as itl
@@ -311,24 +311,24 @@ rg = itl.ResourceGroup("app-rg", subscription=sub, location="westeurope")
 vm = itl.VirtualMachine("web-01", resource_group=rg, size="Standard_D2s")
 ```
 
-Both approaches work. Terraform is widely adopted and declarative. Pulumi gives you loops, conditionals, type safety, and IDE autocomplete — real programming instead of a DSL. Pick your poison.
+Both approaches work. Terraform is widely adopted and declarative. Pulumi gives you loops, conditionals, type safety, and IDE autocomplete. Real programming instead of a DSL. Pick your poison.
 
 **Operations:**
 - Helm charts for production Kubernetes deployment
 - Prometheus/Grafana integration for platform observability
-- Disaster recovery — backup/restore of control plane state
+- Disaster recovery including backup/restore of control plane state
 
 ## Why Build This?
 
 The idea started a few months ago, sparked by **geopolitical tensions** and the growing conversation around **data sovereignty**. When your data lives in someone else's cloud, you're subject to their jurisdiction, their policies, their geopolitical reality. CLOUD Act and the list goes on.
 
-What if you need to run infrastructure that stays within your borders? What if "the cloud" needs to be *your* cloud — on premises you control, in datacenters you choose, under laws you understand?
+What if you need to run infrastructure that stays within your borders? What if "the cloud" needs to be *your* cloud, on premises you control, in datacenters you choose, under laws you understand?
 
 But there's another reason: **demystification**.
 
-Commercial clouds are built on the same technologies available to everyone. Take Entra ID with its Privileged Identity Management (PIM) feature — sounds enterprise-grade and complex, right? It's role assignments with time-based expiration and approval workflows. Keycloak can do that. Service accounts? Managed identities? Those are just identity tokens with specific scopes and rotation policies. VNets and tunnels? That's VLANs, WireGuard, and routing tables with a nice API in front.
+Commercial clouds are built on the same technologies available to everyone. Take Entra ID with its Privileged Identity Management (PIM) feature. Sounds enterprise-grade and complex, right? It's role assignments with time-based expiration and approval workflows. Keycloak can do that. Service accounts? Managed identities? Those are just identity tokens with specific scopes and rotation policies. VNets and tunnels? That's VLANs, WireGuard, and routing tables with a nice API in front.
 
-The magic isn't the technology — it's the **abstraction layer** that makes it manageable. Azure doesn't have secret sauce for virtual networks; they have excellent APIs, consistent resource models, and governance tooling that ties it all together.
+The magic isn't the technology. It's the **abstraction layer** that makes it manageable. Azure doesn't have secret sauce for virtual networks; they have excellent APIs, consistent resource models, and governance tooling that ties it all together.
 
 If you can build the control plane, you can build the cloud. The individual services (compute, storage, networking, identity) are well-understood problems with mature open-source solutions. The hard part is making them work *together* in a governable, multi-tenant, enterprise-ready way.
 
@@ -344,7 +344,7 @@ But I also saw enterprise after enterprise struggle with common problems:
 4. **Multi-cloud chaos** — Different tooling for every provider
 5. **Tribal knowledge** — The one person who knows where things are leaves
 
-A proper control plane solves these problems **before** you have them. The abstraction layer isn't overhead — it's the foundation everything else builds on.
+A proper control plane solves these problems **before** you have them. The abstraction layer isn't overhead. It's the foundation everything else builds on.
 
 ## Try It Yourself
 

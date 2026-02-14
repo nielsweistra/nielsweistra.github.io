@@ -248,16 +248,15 @@ The SDK is the single source of truth. The API gateway doesn't know about Azure 
 ├─────────────────────────────────────────────────────┤
 │                                                     │
 │  ├─ ResourceProvider (ABC)                         │
-│  │  └─ create(), read(), delete(), list() abstract │
-│  │                                                  │
-│  ├─ IdentityProvider (ABC)                         │
-│  │  └─ create_realm(), create_user(), etc abstract │
+│  │  ├─ create(), read(), delete(), list() abstract │
+│  │  └─ All providers implement this contract       │
 │  │                                                  │
 │  ├─ StorageEngine (ABC)                            │
 │  │  └─ Async ORM with SQLAlchemy 2.0               │
 │  │                                                  │
 │  └─ Resource Models                                │
 │     ├─ TenantModel, RealmModel, UserModel          │
+│     ├─ SpecModels (TenantSpec, RealmSpec, etc)     │
 │     └─ Full type hints + Pydantic validation       │
 │                                                     │
 └────────────────────┬────────────────────────────────┘
@@ -266,26 +265,32 @@ The SDK is the single source of truth. The API gateway doesn't know about Azure 
     │                │                │
 ┌───▼────────┐  ┌───▼──────────┐  ┌─▼────────────┐
 │Core Provider   │IAM Provider  │ │Compute Provider
-│(Implements)    │(Implements)  │ │(Future)
+│ResourceProvider│ResourceProvider│ResourceProvider
+│(Implements)    │(Implements)  │ │(Implements)
 └────────────┘  └──────────────┘  └────────────┘
 ```
 
 ### Key SDK Components
 
-#### 1. Resource Provider Contract
+#### 1. Resource Provider Contract (All Providers Implement)
 
 ```python
 class ResourceProvider(ABC):
-    """Base contract all providers implement."""
+    """Base contract all providers implement — Core, IAM, Compute, Storage, etc."""
     
     @abstractmethod
     async def create(self, spec: ResourceSpec, context: ProviderContext) -> Resource:
-        """Create a resource."""
+        """Create a resource from specification.
+        
+        For Core Provider: Create tenant, subscription, resource group
+        For IAM Provider: Create realm, user, role
+        For Compute Provider: Create VM, disk, network
+        """
         pass
     
     @abstractmethod
     async def delete(self, resource_id: str, context: ProviderContext) -> None:
-        """Delete a resource."""
+        """Delete a resource by ID."""
         pass
     
     @abstractmethod
@@ -294,29 +299,9 @@ class ResourceProvider(ABC):
         pass
 ```
 
-#### 2. Identity Provider Contract
+Every provider implements the same contract. The resource types differ (tenants vs users vs VMs), but the operational interface is identical. This allows the API gateway to route requests to any provider without provider-specific logic.
 
-```python
-class IdentityProvider(ABC):
-    """Base for all identity implementations (Keycloak, Azure AD, Okta)."""
-    
-    @abstractmethod
-    async def create_realm(self, spec: RealmSpec) -> Realm:
-        """Create identity realm."""
-        pass
-    
-    @abstractmethod
-    async def create_user(self, realm_id: str, spec: UserSpec) -> User:
-        """Create user in realm."""
-        pass
-    
-    @abstractmethod
-    async def create_role(self, realm_id: str, spec: RoleSpec) -> Role:
-        """Create role in realm."""
-        pass
-```
-
-#### 3. Storage Engine Pattern
+#### 2. Storage Engine Pattern
 
 ```python
 class StorageEngine(ABC):

@@ -496,6 +496,10 @@ Remember from the first post how we talked about organizational hierarchy? Tenan
 
 A tenant is an organization. Under each tenant, you create subscriptions — billing and organizational domains. Within each subscription, you create resource groups — logical collections of resources. These aren't just database records — they're governance scopes. You can attach policies at the subscription level, audit at the resource group level, set budgets per subscription.
 
+But here's where ITL ControlPlane differs from Azure. In Azure, when you create a tenant, you get exactly one EntraID directory. It's a 1-to-1 relationship. Your tenant and your identity provider are locked together. You can't have multiple identity instances within the same organization — if you need separate identity realms, you need separate tenants.
+
+In ITL, realms are Core Provider resources. They're part of the organizational hierarchy, not a separate service locked at the tenant level. This means a single tenant can have 1, 2, or N realms. Event-driven coordination between Core Provider and IAM Provider creates each realm in Keycloak, but from the organizational perspective, they all belong to the same tenant. The separation of concerns — organizational hierarchy (Core) from identity management (IAM) — makes this possible. No monolithic coupling. No 1-to-1 locks.
+
 This is what separates "a cloud you built" from "a bunch of servers you manage". The abstraction layer.
 
 ### Core Resources

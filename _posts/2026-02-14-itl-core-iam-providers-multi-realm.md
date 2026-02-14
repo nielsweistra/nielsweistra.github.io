@@ -11,7 +11,7 @@ image: "/assets/itl-multi-realm-architecture.png"
 
 # ITL ControlPlane: Core & IAM Providers - Multi-Realm Architecture
 
-In our [previous post](/2026/02/09/building-your-own-cloud-itl-control-plane-alpha.html), we introduced the ITL ControlPlane — the abstraction layer that comes *before* infrastructure. We talked about why patterns matter: hierarchical resource models, audit trails, governance at scale.
+In our [previous post](/blog/2026/02/09/itl-control-plane-alpha/), we introduced the ITL ControlPlane — the abstraction layer that comes *before* infrastructure. We talked about why patterns matter: hierarchical resource models, audit trails, governance at scale.
 
 Today, we're going deeper. We're showing you the **first two resource providers** that make this abstraction real: **Core Provider** (resource management) and **IAM Provider** (identity & access management). These aren't just API endpoints. They're the foundation that everything else builds on.
 

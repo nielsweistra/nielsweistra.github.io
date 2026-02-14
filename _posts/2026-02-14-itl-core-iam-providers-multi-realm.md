@@ -278,6 +278,13 @@ The SDK is the single source of truth. The API gateway doesn't know about Azure 
 class ResourceProvider(ABC):
     """Base contract all providers implement — Core, IAM, Compute, Storage, etc."""
     
+    # Hook names for lifecycle extensibility
+    HOOK_BEFORE_CREATE = "before_create"
+    HOOK_AFTER_CREATE = "after_create"
+    HOOK_BEFORE_DELETE = "before_delete"
+    HOOK_AFTER_DELETE = "after_delete"
+    HOOK_ON_ERROR = "on_error"
+    
     @abstractmethod
     async def create(self, spec: ResourceSpec, context: ProviderContext) -> Resource:
         """Create a resource from specification.
@@ -285,12 +292,25 @@ class ResourceProvider(ABC):
         For Core Provider: Create tenant, subscription, resource group
         For IAM Provider: Create realm, user, role
         For Compute Provider: Create VM, disk, network
+        
+        Lifecycle:
+            - Hook: before_create(spec, context)
+            - Provider creates resource
+            - Hook: after_create(resource, context)
+            - Hook: on_error(spec, context, error) if operation fails
         """
         pass
     
     @abstractmethod
     async def delete(self, resource_id: str, context: ProviderContext) -> None:
-        """Delete a resource by ID."""
+        """Delete a resource by ID.
+        
+        Lifecycle:
+            - Hook: before_delete(resource_id, context)
+            - Provider deletes resource
+            - Hook: after_delete(resource_id, context)
+            - Hook: on_error(resource_id, context, error) if operation fails
+        """
         pass
     
     @abstractmethod
@@ -483,7 +503,7 @@ A tenant is an organization. Under each tenant, you create subscriptions — bil
 
 But here's where ITL ControlPlane differs from Azure. In Azure, when you create a tenant, you get exactly one EntraID directory. It's a 1-to-1 relationship. Your tenant and your identity provider are locked together. You can't have multiple identity instances within the same organization — if you need separate identity realms, you need separate tenants.
 
-In ITL, realms are Core Provider resources. They're part of the organizational hierarchy, not a separate service locked at the tenant level. This means a single tenant can have 1, 2, or N realms. Event-driven coordination between Core Provider and IAM Provider creates each realm in Keycloak, but from the organizational perspective, they all belong to the same tenant. The separation of concerns — organizational hierarchy (Core) from identity management (IAM) — makes this possible. No monolithic coupling. No 1-to-1 locks.
+In ITL ControlPlane, realms are Core Provider resources. They're part of the organizational hierarchy, not a separate service locked at the tenant level. This means a single tenant can have 1, 2, or N realms. Event-driven coordination between Core Provider and IAM Provider creates each realm in Keycloak, but from the organizational perspective, they all belong to the same tenant. The separation of concerns — organizational hierarchy (Core) from identity management (IAM) — makes this possible. No monolithic coupling. No 1-to-1 locks.
 
 This is what separates "a cloud you built" from "a bunch of servers you manage". The abstraction layer.
 

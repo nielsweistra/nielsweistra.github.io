@@ -1,0 +1,140 @@
+---
+layout: page
+title: "Blog Categories"
+permalink: /blog/categories/
+---
+
+<div class="categories-page">
+  <h1>Blog Categories</h1>
+  <p>Browse posts by category</p>
+  
+  <div class="categories-grid">
+    {% assign categories = "" | split: "," %}
+    {% for post in site.posts %}
+      {% for category in post.categories %}
+        {% unless categories contains category %}
+          {% assign categories = categories | push: category %}
+        {% endunless %}
+      {% endfor %}
+    {% endfor %}
+    
+    {% assign sorted_categories = categories | sort %}
+    {% for category in sorted_categories %}
+      {% assign posts_in_category = "" | split: "," %}
+      {% for post in site.posts %}
+        {% if post.categories contains category %}
+          {% assign posts_in_category = posts_in_category | push: post %}
+        {% endif %}
+      {% endfor %}
+      
+      <div class="category-card">
+        <h3><a href="#{{ category | downcase | replace: ' ', '-' }}">{{ category }}</a></h3>
+        <p class="post-count">{{ posts_in_category | size }} post{% if posts_in_category.size != 1 %}s{% endif %}</p>
+      </div>
+    {% endfor %}
+  </div>
+  
+  <hr>
+  
+  <div class="categories-detailed">
+    {% for category in sorted_categories %}
+      {% assign posts_in_category = "" | split: "," %}
+      {% for post in site.posts %}
+        {% if post.categories contains category %}
+          {% assign posts_in_category = posts_in_category | push: post %}
+        {% endif %}
+      {% endfor %}
+      
+      <h2 id="{{ category | downcase | replace: ' ', '-' }}">{{ category }}</h2>
+      <ul class="post-list">
+        {% for post in posts_in_category %}
+          <li>
+            <a href="{{ post.url }}">{{ post.title }}</a>
+            <span class="post-date">{{ post.date | date: "%B %d, %Y" }}</span>
+          </li>
+        {% endfor %}
+      </ul>
+    {% endfor %}
+  </div>
+</div>
+
+<style>
+.categories-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin: 2rem 0;
+}
+
+.category-card {
+  padding: 1.5rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border-left: 4px solid #ffc451;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.category-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.category-card h3 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.category-card a {
+  color: #151515;
+  text-decoration: none;
+}
+
+.category-card a:hover {
+  color: #ffc451;
+}
+
+.post-count {
+  margin: 0.5rem 0 0;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.categories-detailed {
+  margin-top: 3rem;
+}
+
+.post-list {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0 2rem;
+}
+
+.post-list li {
+  margin: 0.75rem 0;
+  padding-left: 1.5rem;
+  position: relative;
+}
+
+.post-list li:before {
+  content: "→";
+  position: absolute;
+  left: 0;
+  color: #ffc451;
+}
+
+.post-list a {
+  color: #444;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.post-list a:hover {
+  color: #ffc451;
+}
+
+.post-date {
+  color: #999;
+  font-size: 0.85rem;
+  margin-left: 1rem;
+}
+</style>

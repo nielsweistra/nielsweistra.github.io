@@ -1,0 +1,59 @@
+<!-- JSON-LD Schema Markup for SEO -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "{% if page.layout == 'post' %}BlogPosting{% else %}WebPage{% endif %}",
+  "headline": "{{ page.title | jsonify }}",
+  "description": "{% if page.excerpt %}{{ page.excerpt | strip_html | jsonify }}{% else %}{{ site.description | jsonify }}{% endif %}",
+  "image": "{% if page.image %}{{ page.image | absolute_url | jsonify }}{% else %}{{ '/assets/images/og-default.png' | absolute_url | jsonify }}{% endif %}",
+  "url": "{{ page.url | absolute_url | jsonify }}",
+  "datePublished": "{{ page.date | date: '%Y-%m-%dT%H:%M:%S%z' | jsonify }}",
+  {% if page.date %}
+  "dateModified": "{{ page.date | date: '%Y-%m-%dT%H:%M:%S%z' | jsonify }}",
+  {% endif %}
+  "author": {
+    "@type": "Person",
+    "name": "{% if page.author %}{{ page.author }}{% else %}{{ site.author }}{% endif %}",
+    "url": "{{ site.url | jsonify }}"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "{{ site.title | jsonify }}",
+    "url": "{{ site.url | jsonify }}",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "{{ '/assets/images/logo.png' | absolute_url | jsonify }}",
+      "width": 500,
+      "height": 500
+    }
+  },
+  {% if page.categories %}
+  "articleSection": "{{ page.categories | first | jsonify }}",
+  "keywords": [
+    {% for category in page.categories %}"{{ category }}"{% unless forloop.last %},{% endunless %}{% endfor %}
+    {% if page.tags %},{% for tag in page.tags %}"{{ tag }}"{% unless forloop.last %},{% endunless %}{% endfor %}{% endif %}
+  ],
+  {% endif %}
+  "wordCount": "{{ page.content | number_of_words }}",
+  "readingTime": {% if page.reading_time %}"{{ page.reading_time }} min read"{% else %}"{{ page.content | number_of_words | divided_by: 200 | ceil }} min read"{% endif %}
+}
+</script>
+
+<!-- Organization Schema -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  "name": "{{ site.title }}",
+  "url": "{{ site.url }}",
+  "sameAs": [
+    "https://github.com/nielsweistra",
+    "https://linkedin.com/in/nielsweistra"
+  ],
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "contactType": "Customer Support",
+    "url": "{{ site.url }}/contact"
+  }
+}
+</script>

@@ -5,6 +5,14 @@ date: 2026-02-16
 author: "Niels Weistra"
 categories: [Architecture, SecurityOps, Performance]
 tags: [containers, alpine, optimization, security, control-plane]
+excerpt: "Reduced ITL provider containers from 1.2GB to 308MB (74% smaller) with zero functionality loss. Learn the three optimizations that improve security, deployment speed, and reduce attack surface."
+image: /assets/images/docker-optimization.png
+reading_time: 8
+seo:
+  type: "BlogPosting"
+  author: "Niels Weistra"
+  datePublished: "2026-02-16"
+  keywords: ["Docker", "Container", "Alpine Linux", "Security", "Optimization"]
 ---
 
 Last week I realized we were shipping 1.2GB containers when the application needed maybe 150MB. That's 87% waste—and more importantly, a **security liability**. Every package manager, compiler, and build tool is an attack surface that doesn't need to exist in production.
@@ -116,3 +124,25 @@ That's the philosophy behind the ITL Control Plane. Abstract first, optimize sec
 ---
 
 *Part of the ITL Control Plane series. Previously: [Building Your Own Cloud: ITL Control Plane Alpha](/blog/2026/02/09/itl-control-plane-alpha/)*
+
+---
+
+## Related Posts in This Series
+
+- **[Building Your Own Cloud: ITL Control Plane Alpha](/blog/2026/02/09/itl-control-plane-alpha/)** — Architecture and design principles behind the ITL Control Plane
+- **[Core IAM Providers: Multi-Realm Identity Architecture](/blog/2026/02/14/itl-core-iam-providers-multi-realm/)** — How identity federation scales across multiple Keycloak realms
+
+---
+
+## About the Author
+
+**Niels Weistra** is a systems architect specializing in Kubernetes, cloud infrastructure, and control plane design. He leads the ITL (Infrastructure-as-Code Transformation Layer) project, focusing on production-grade security, observability, and operational excellence.
+
+- **GitHub**: [@nielsweistra](https://github.com/nielsweistra)
+- **Email**: [niels@example.com](mailto:niels@example.com)
+- **Read more**: [All posts by Niels](/authors/niels-weistra/)
+
+**Share this post:**
+- [Twitter](https://twitter.com/intent/tweet?url=https://nielsweistra.github.io/blog/2026/02/16/optimizing-docker-container-footprint/&text=Smaller%20Containers,%20Fewer%20Vulnerabilities%20-%20Docker%20optimization%20guide)
+- [LinkedIn](https://www.linkedin.com/sharing/share-offsite/?url=https://nielsweistra.github.io/blog/2026/02/16/optimizing-docker-container-footprint/)
+- [Reddit](https://reddit.com/submit?url=https://nielsweistra.github.io/blog/2026/02/16/optimizing-docker-container-footprint/&title=Smaller%20Containers,%20Fewer%20Vulnerabilities)

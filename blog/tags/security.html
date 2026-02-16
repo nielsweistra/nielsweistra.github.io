@@ -1,0 +1,170 @@
+---
+layout: page
+title: "Posts Tagged: security"
+permalink: /blog/tags/security/
+tag: security
+excerpt: "All posts tagged with security"
+---
+
+<div class="tag-page">
+  <div class="tag-header">
+    <h1>Posts Tagged: <span class="tag-name">{{ page.tag }}</span></h1>
+    <p class="tag-description">All posts related to {{ page.tag }}</p>
+  </div>
+  
+  <div class="posts-list">
+    {% for post in site.posts %}
+      {% if post.tags contains page.tag %}
+        <article class="post-item">
+          <div class="post-info">
+            <h2><a href="{{ post.url }}">{{ post.title }}</a></h2>
+            <time class="post-date" datetime="{{ post.date | date: '%Y-%m-%dT%H:%M:%S%z' }}">
+              {{ post.date | date: "%B %d, %Y" }}
+            </time>
+          </div>
+          
+          {% if post.excerpt %}
+            <p class="post-excerpt">{{ post.excerpt | strip_html | truncatewords: 40 }}</p>
+          {% endif %}
+          
+          {% if post.categories %}
+            <div class="post-categories">
+              {% for category in post.categories %}
+                <a href="/blog/categories/#{{ category | downcase | replace: ' ', '-' }}" class="category-badge">{{ category }}</a>
+              {% endfor %}
+            </div>
+          {% endif %}
+        </article>
+      {% endif %}
+    {% endfor %}
+  </div>
+  
+  <div class="tag-nav">
+    <a href="/blog/tags/">← All Tags</a>
+    <a href="/blog/">← Back to Blog</a>
+  </div>
+</div>
+
+<style>
+.tag-page {
+  max-width: 900px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.tag-header {
+  text-align: center;
+  margin-bottom: 3rem;
+  padding-bottom: 2rem;
+  border-bottom: 2px solid #ffc451;
+}
+
+.tag-header h1 {
+  margin: 0 0 1rem;
+  font-size: 2.5rem;
+}
+
+.tag-name {
+  color: #ffc451;
+  background: #f8f9fa;
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  padding: 0.4rem 0.8rem;
+}
+
+.tag-description {
+  color: #666;
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.posts-list {
+  display: grid;
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.post-item {
+  padding: 1.5rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border-left: 4px solid #ffc451;
+  transition: all 0.3s;
+}
+
+.post-item:hover {
+  transform: translateX(8px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.post-info h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1.5rem;
+}
+
+.post-info a {
+  color: #151515;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.post-item:hover .post-info a {
+  color: #ffc451;
+}
+
+.post-date {
+  color: #999;
+  font-size: 0.9rem;
+  display: block;
+}
+
+.post-excerpt {
+  color: #555;
+  margin: 1rem 0;
+  line-height: 1.6;
+}
+
+.post-categories {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.category-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  color: #666;
+  text-decoration: none;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+}
+
+.category-badge:hover {
+  background: #ffc451;
+  border-color: #ffc451;
+  color: #151515;
+}
+
+.tag-nav {
+  display: flex;
+  gap: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid #ddd;
+  justify-content: center;
+}
+
+.tag-nav a {
+  color: #ffc451;
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.tag-nav a:hover {
+  color: #151515;
+}
+</style>

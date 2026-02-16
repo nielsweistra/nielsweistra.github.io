@@ -131,18 +131,3 @@ That's the philosophy behind the ITL Control Plane. Abstract first, optimize sec
 
 - **[Building Your Own Cloud: ITL Control Plane Alpha](/blog/2026/02/09/itl-control-plane-alpha/)** — Architecture and design principles behind the ITL Control Plane
 - **[Core IAM Providers: Multi-Realm Identity Architecture](/blog/2026/02/14/itl-core-iam-providers-multi-realm/)** — How identity federation scales across multiple Keycloak realms
-
----
-
-## About the Author
-
-**Niels Weistra** is a systems architect specializing in Kubernetes, cloud infrastructure, and control plane design. He leads the ITL (Infrastructure-as-Code Transformation Layer) project, focusing on production-grade security, observability, and operational excellence.
-
-- **GitHub**: [@nielsweistra](https://github.com/nielsweistra)
-- **Email**: [niels@example.com](mailto:niels@example.com)
-- **Read more**: [All posts by Niels](/authors/niels-weistra/)
-
-**Share this post:**
-- [Twitter](https://twitter.com/intent/tweet?url=https://nielsweistra.github.io/blog/2026/02/16/optimizing-docker-container-footprint/&text=Smaller%20Containers,%20Fewer%20Vulnerabilities%20-%20Docker%20optimization%20guide)
-- [LinkedIn](https://www.linkedin.com/sharing/share-offsite/?url=https://nielsweistra.github.io/blog/2026/02/16/optimizing-docker-container-footprint/)
-- [Reddit](https://reddit.com/submit?url=https://nielsweistra.github.io/blog/2026/02/16/optimizing-docker-container-footprint/&title=Smaller%20Containers,%20Fewer%20Vulnerabilities)

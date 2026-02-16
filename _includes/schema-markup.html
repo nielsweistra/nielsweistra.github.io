@@ -13,7 +13,7 @@
   {% endif %}
   "author": {
     "@type": "Person",
-    "name": "{% if page.author %}{{ page.author }}{% else %}{{ site.author }}{% endif %}",
+    "name": "{% if page.author %}{{ page.author }}{% else %}{{ site.author.name }}{% endif %}",
     "url": "{{ site.url | jsonify }}"
   },
   "publisher": {

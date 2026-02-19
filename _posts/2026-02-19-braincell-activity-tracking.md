@@ -129,7 +129,7 @@ This matters because:
 
 Every activity is timestamped and categorized:
 
-**Monday**: Documentation restructure
+**Monday:** Documentation restructure
 - "Consolidate 20 scattered docs → 9 focused guides (55% reduction)"
 - "Delete DEPLOYMENT.md, MICROSERVICES.md, MIGRATION.md (outdated content)"
 - Rationale: *Single source of truth reduces confusion, prevents conflicting guidance*
@@ -159,9 +159,9 @@ Every activity is timestamped and categorized:
 
 Here's the before-and-after:
 
-**Monday morning:** 3 separate repos with 20 scattered documentation files. Decisions lost in commits. Each project built independently. No visible connection between how AssignmentHunter filters jobs, how ControlPlane routes requests, how BrainCell scores results. Knowledge lived in my head.
+**Monday:** 3 separate repos with 20 scattered documentation files. Decisions lost in commits. Each project built independently. No visible connection between how AssignmentHunter filters jobs, how ControlPlane routes requests, how BrainCell scores results. Knowledge lived in my head.
 
-**Thursday afternoon:** 147 documented activities across all three systems. Every decision tagged, dated, and searchable. 13 component summaries showing how AssignmentHunter works. 60+ architecture decisions showing how ControlPlane works. Clear visibility into how all three systems share consistent patterns.
+**Thursday:** 147 documented activities across all three systems. Every decision tagged, dated, and searchable. 13 component summaries showing how AssignmentHunter works. 60+ architecture decisions showing how ControlPlane works. Clear visibility into how all three systems share consistent patterns.
 
 **The practical difference:**
 

@@ -195,14 +195,22 @@ Apply it beyond containers: remove unnecessary code, unnecessary dependencies, u
 That's the philosophy behind the ITL Control Plane. Abstract first, optimize second.
 
 **If you're shipping containers, follow this checklist:**
-- Switch to Alpine base (or Distroless for maximum hardening)
-- Multi-stage builds (builder stage + runtime stage)
-- Remove SDK/source directories after pip install
-- Remove build artifacts (build/, *.egg-info)
-- Strip test files and documentation
-- Remove `__pycache__` and `.pyc` files
-- Test end-to-end before production
-- Run vulnerability scans pre/post optimization
+
+↗ Switch to Alpine base (or Distroless for maximum hardening)
+
+↗ Multi-stage builds (builder stage + runtime stage)
+
+↗ Remove SDK/source directories after pip install
+
+↗ Remove build artifacts (build/, *.egg-info)
+
+↗ Strip test files and documentation
+
+↗ Remove `__pycache__` and `.pyc` files
+
+↗ Test end-to-end before production
+
+↗ Run vulnerability scans pre/post optimization
 
 ---
 

@@ -458,19 +458,81 @@
 
         /* Article content */
         .article-content {
-            max-width: 800px;
+            max-width: min(900px, 100%);
             margin: 0 auto;
             line-height: 1.8;
+            padding: 0 1rem;
         }
 
-        .article-content h1, .article-content h2, .article-content h3 {
+        @media (min-width: 1200px) {
+            .article-content {
+                max-width: 960px;
+            }
+        }
+
+        .article-content h1 {
+            font-size: clamp(1.6rem, 4vw, 2.4rem);
             color: var(--heading-color);
             margin-top: 2rem;
             margin-bottom: 1rem;
         }
 
+        .article-content h2 {
+            font-size: clamp(1.3rem, 3vw, 1.9rem);
+            color: var(--heading-color);
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .article-content h3 {
+            font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+            color: var(--heading-color);
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .article-content h4, .article-content h5, .article-content h6 {
+            color: var(--heading-color);
+            margin-top: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+
         .article-content p {
             margin-bottom: 1.5rem;
+        }
+
+        .article-content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 6px;
+        }
+
+        /* Responsive tables */
+        .article-content table {
+            display: block;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+            font-size: clamp(0.8rem, 1.5vw, 1rem);
+        }
+
+        .article-content table th,
+        .article-content table td {
+            padding: 0.6rem 1rem;
+            border: 1px solid #e9ecef;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        .article-content table th {
+            background: #f8f9fa;
+            font-weight: 600;
+        }
+
+        .article-content table tr:nth-child(even) td {
+            background: #fafbfc;
         }
 
         .article-content pre {
@@ -478,18 +540,66 @@
             padding: 1.5rem;
             border-radius: 8px;
             overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
             margin: 2rem 0;
             font-family: 'JetBrains Mono', 'Roboto Mono', monospace;
+            font-size: clamp(0.78rem, 1.4vw, 0.9rem);
+        }
+
+        .article-content code:not(pre code) {
+            background: #f1f3f4;
+            padding: 0.15rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.88em;
+            font-family: 'JetBrains Mono', 'Roboto Mono', monospace;
+            color: #c7254e;
+            word-break: break-word;
         }
 
         .article-content blockquote {
             border-left: 4px solid var(--accent-color);
-            padding-left: 1.5rem;
             margin: 2rem 0;
             font-style: italic;
             background: #f9f9f9;
             padding: 1.5rem;
             border-radius: 0 8px 8px 0;
+        }
+
+        /* Mermaid diagrams */
+        .article-content .mermaid {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        @media (max-width: 768px) {
+            .article-content {
+                padding: 0 0.25rem;
+            }
+            .article-content pre {
+                padding: 1rem;
+                font-size: 0.8rem;
+                border-radius: 6px;
+            }
+            .article-content table th,
+            .article-content table td {
+                padding: 0.4rem 0.6rem;
+                font-size: 0.82rem;
+            }
+            .article-content blockquote {
+                padding: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .article-content pre {
+                font-size: 0.75rem;
+                padding: 0.75rem;
+            }
+            .article-content table th,
+            .article-content table td {
+                font-size: 0.78rem;
+                padding: 0.3rem 0.5rem;
+            }
         }
 
         /* Social Links */
@@ -562,6 +672,32 @@
 
             .section h2 {
                 font-size: 2rem;
+            }
+
+            .main {
+                padding: 2rem 0;
+            }
+
+            .container {
+                padding: 0 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 8px;
+            }
+
+            .main {
+                padding: 1.5rem 0;
+            }
+
+            .logo h1 {
+                font-size: 24px;
+            }
+
+            .logo span {
+                font-size: 24px;
             }
         }
 

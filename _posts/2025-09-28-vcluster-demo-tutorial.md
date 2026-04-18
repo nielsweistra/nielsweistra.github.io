@@ -32,16 +32,16 @@ The vCluster Cluster API provider enables declarative management of virtual Kube
 
 ## Architecture Overview
 
-```yaml
-# Enterprise vCluster Architecture
-Management Cluster (CAPI)
-├── Cluster API Core Components
-├── vCluster Provider (Helm Chart)
-├── Infrastructure Providers (AWS, Azure, etc.)
-└── Virtual Clusters (Helm Managed)
-    ├── vCluster A (Namespace: vcluster-demo)
-    ├── vCluster B (Namespace: vcluster-staging)  
-    └── vCluster C (Namespace: vcluster-prod)
+```mermaid
+graph TD
+    MC[Management Cluster CAPI]
+    MC --> CAPI[Cluster API Core Components]
+    MC --> VCP[vCluster Provider - Helm Chart]
+    MC --> IP[Infrastructure Providers - AWS / Azure / GCP]
+    MC --> VC[Virtual Clusters - Helm Managed]
+    VC --> VCA[vCluster A - vcluster-demo]
+    VC --> VCB[vCluster B - vcluster-staging]
+    VC --> VCC[vCluster C - vcluster-prod]
 ```
 
 ## Prerequisites

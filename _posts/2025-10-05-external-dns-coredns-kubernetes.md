@@ -32,16 +32,18 @@ We'll create:
 
 ## Architecture
 
-```
-External Clients
-       ↓
-   10.99.99.21 (LoadBalancer)
-       ↓
-   CoreDNS Pods
-       ↓
-   Zone Files (ConfigMaps)
-   ├── Static: int.itlusions.com
-   └── Dynamic: dyn.int.itlusions.com
+```mermaid
+graph TD
+    EC[External Clients]
+    LB[MetalLB LoadBalancer\n10.99.99.21]
+    CD[CoreDNS Pods]
+    ZF[Zone Files - ConfigMaps]
+    SZ[Static Zone\nint.itlusions.com]
+    DZ[Dynamic Zone\ndyn.int.itlusions.com]
+
+    EC --> LB --> CD --> ZF
+    ZF --> SZ
+    ZF --> DZ
 ```
 
 ## Prerequisites

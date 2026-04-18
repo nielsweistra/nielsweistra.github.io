@@ -37,28 +37,34 @@ Azure, AWS, and GCP all solved these problems first. Their control planes (the a
 
 ITL Control Plane implements a hierarchical resource model inspired by Azure Resource Manager (ARM):
 
-```
-                    ┌─────────────┐
-                    │   Tenant    │  (Organization boundary)
-                    └──────┬──────┘
-                           │
-              ┌────────────┼────────────┐
-              │            │            │
-     ┌────────▼─────┐ ┌────▼────┐ ┌─────▼─────┐
-     │ Management   │ │ Mgmt    │ │ Mgmt      │  (Governance scope)
-     │ Group        │ │ Group   │ │ Group     │
-     └──────┬───────┘ └────┬────┘ └─────┬─────┘
-            │              │            │
-     ┌──────▼──────┐  ┌────▼────┐  ┌────▼────┐
-     │ Subscription│  │ Sub     │  │ Sub     │  (Billing/isolation)
-     └──────┬──────┘  └────┬────┘  └────┬────┘
-            │              │            │
-     ┌──────▼──────┐  ┌────▼────┐  ┌────▼────┐
-     │ Resource    │  │ RG      │  │ RG      │  (Logical grouping)
-     │ Group       │  │         │  │         │
-     └──────┬──────┘  └────┬────┘  └────┬────┘
-            │              │            │
-        Resources      Resources    Resources    (VMs, databases, etc.)
+```mermaid
+graph TD
+    T[Tenant\nOrganization boundary]
+    MG1[Management Group]
+    MG2[Management Group]
+    MG3[Management Group]
+    S1[Subscription\nBilling / isolation]
+    S2[Subscription]
+    S3[Subscription]
+    RG1[Resource Group\nLogical grouping]
+    RG2[Resource Group]
+    RG3[Resource Group]
+    R1[Resources\nVMs, databases, etc.]
+    R2[Resources]
+    R3[Resources]
+
+    T --> MG1
+    T --> MG2
+    T --> MG3
+    MG1 --> S1
+    MG2 --> S2
+    MG3 --> S3
+    S1 --> RG1
+    S2 --> RG2
+    S3 --> RG3
+    RG1 --> R1
+    RG2 --> R2
+    RG3 --> R3
 ```
 
 Every resource has a **hierarchical ID** that tells you exactly where it lives:

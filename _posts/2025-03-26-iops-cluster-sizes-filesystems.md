@@ -46,13 +46,13 @@ spec:
     volume.beta.kubernetes.io/storage-provisioned-iops: "3000"
 ```
 
-**Workload Categories:**
-
-- **Databases**: 1000-10000+ IOPS
-- **Log aggregation**: 500-2000 IOPS
-- **Web applications**: 100-500 IOPS
-- **Batch processing**: 50-200 IOPS
-- **Static content**: 10-50 IOPS
+| Workload Type | Minimum IOPS | Typical IOPS | Storage Tier |
+|---|---|---|---|
+| Databases | 1,000 | 3,000–10,000+ | NVMe SSD |
+| Log aggregation | 500 | 500–2,000 | SSD |
+| Web applications | 100 | 100–500 | SSD or HDD |
+| Batch processing | 50 | 50–200 | HDD |
+| Static content | 10 | 10–50 | HDD |
 
 ## Cluster Sizing: The Foundation of Performance
 
@@ -60,37 +60,18 @@ spec:
 
 Cluster sizing isn't just about CPU and memory—storage performance scales with your infrastructure choices:
 
-#### Small Clusters (1-10 nodes)
-```yaml
-# Optimal for development and small production workloads
-Node Specs:
-  CPU: 4-8 cores
-  Memory: 16-32 GB
-  Storage: 100-500 GB SSD
-  Network: 1-10 Gbps
-  Expected IOPS: 1000-3000 per node
-```
+| Cluster Size | Nodes | CPU (per node) | RAM (per node) | Storage (per node) | Network | Expected IOPS |
+|---|---|---|---|---|---|---|
+| Small | 1–10 | 4–8 cores | 16–32 GB | 100–500 GB SSD | 1–10 Gbps | 1,000–3,000 |
+| Medium | 10–50 | 8–16 cores | 32–64 GB | 500–1,000 GB SSD | 10–25 Gbps | 3,000–8,000 |
+| Large | 50+ | 16–32+ cores | 64–128+ GB | 1,000+ GB NVMe SSD | 25+ Gbps | 8,000–20,000+ |
 
-#### Medium Clusters (10-50 nodes)
-```yaml
-# Production workloads with moderate scaling
-Node Specs:
-  CPU: 8-16 cores
-  Memory: 32-64 GB
-  Storage: 500-1000 GB SSD
-  Network: 10-25 Gbps
-  Expected IOPS: 3000-8000 per node
-```
-
-#### Large Clusters (50+ nodes)
-```yaml
-# High-scale production environments
-Node Specs:
-  CPU: 16-32+ cores
-  Memory: 64-128+ GB
-  Storage: 1000+ GB NVMe SSD
-  Network: 25+ Gbps
-  Expected IOPS: 8000-20000+ per node
+```mermaid
+xychart-beta
+    title "Expected IOPS by Cluster Size"
+    x-axis ["Small (1-10)", "Medium (10-50)", "Large (50+)"]
+    y-axis "IOPS per node" 0 --> 22000
+    bar [2000, 5500, 14000]
 ```
 
 ### Storage Distribution Patterns
@@ -129,17 +110,12 @@ kubectl get nodes -o custom-columns=NAME:.metadata.name,ZONE:.metadata.labels.'t
 
 ### Case Study: E-commerce Platform
 
-**Before Optimization:**
-- 20-node cluster with spinning disks
-- 150 IOPS per node average
-- Pod startup time: 45-60 seconds
-- Database query latency: 500-1000ms
-
-**After Optimization:**
-- Same cluster with SSD + XFS + proper sizing
-- 5000 IOPS per node average
-- Pod startup time: 5-10 seconds
-- Database query latency: 50-100ms
+| Metric | Before | After | Improvement |
+|---|---|---|---|
+| Storage | Spinning disks | SSD + XFS | — |
+| IOPS per node | 150 avg | 5,000 avg | 33x |
+| Pod startup time | 45–60s | 5–10s | ~6–9x faster |
+| DB query latency | 500–1,000ms | 50–100ms | ~10x faster |
 
 ### Monitoring IOPS in Kubernetes
 

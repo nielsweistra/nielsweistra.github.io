@@ -21,46 +21,19 @@ At the heart of this architecture is an idea that solves a problem we've all fac
 
 The control plane is built on proven, battle-tested technologies: Python and FastAPI for the API tier, PostgreSQL for relational data, Neo4j for resource relationships, RabbitMQ for event streaming, and Keycloak for identity. Docker Compose for local development, Kubernetes and Helm for production. Nothing exotic. Everything chosen for operational clarity and stability.
 
-```
-┌──────────────────────────────────────────────────────────────┐
-│                    API Gateway (Router)                      │
-│  POST /providers/ITL.Core/tenants                            │
-│  POST /providers/ITL.Core/tenants/{tenant}/subscriptions     │
-│  POST /subscriptions/{sub}/resourcegroups                    │
-│  POST /providers/ITL.Core/tenants/{tenant}/realms            │
-└──────────────────────┬───────────────────────────────────────┘
-                       │
-        ┌──────────────┴──────────────┐
-        │                             │
-┌───────▼──────────┐        ┌────────▼──────────┐
-│  Core Provider   │        │  IAM Provider      │
-│  (ITL.Core)      │        │  (ITL.IAM)         │
-│                  │        │                    │
-│ ├─ Tenants       │        │ ├─ Realms          │
-│ ├─ Resource Grps │        │ ├─ Users           │
-│ ├─ Subscriptions │        │ ├─ Roles           │
-│ └─ Locations     │        │ ├─ Service Accts   │
-│                  │        │ └─ Clients         │
-└────────┬─────────┘        └────────┬───────────┘
-         │                           │
-         └───────────────┬───────────┘
-                         ▼
-        ┌─────────────────────────────┐
-        │    PostgreSQL Database      │
-        │  (SDK StorageEngine)        │
-        │                             │
-        │ ├─ tenants                  │
-        │ ├─ realms (multi-per tenant)│
-        │ ├─ subscriptions            │
-        │ ├─ users                    │
-        │ └─ audit trail              │
-        └──────────────┬──────────────┘
-                       │
-                ┌──────▼──────┐
-                │  Keycloak   │
-                │  (Identity  │
-                │   Service)  │
-                └─────────────┘
+```mermaid
+graph TD
+    GW["API Gateway - Router\nPOST /providers/ITL.Core/tenants\nPOST /providers/ITL.Core/tenants/{tenant}/subscriptions\nPOST /subscriptions/{sub}/resourcegroups\nPOST /providers/ITL.Core/tenants/{tenant}/realms"]
+    CP["Core Provider\nITL.Core\n\nTenants\nResource Groups\nSubscriptions\nLocations"]
+    IAM["IAM Provider\nITL.IAM\n\nRealms\nUsers\nRoles\nService Accounts\nClients"]
+    DB["PostgreSQL Database\nSDK StorageEngine\n\ntenants\nrealms\nsubscriptions\nusers\naudit trail"]
+    KC["Keycloak\nIdentity Service"]
+
+    GW --> CP
+    GW --> IAM
+    CP --> DB
+    IAM --> DB
+    DB --> KC
 ```
 
 ## The Multi-Realm Model: Why It Matters
@@ -73,20 +46,19 @@ But there are deeper issues. If you're using a cloud-based identity platform, yo
 
 ### Solution: One Tenant, Multiple Realms
 
-```
-ACME Corporation (Tenant)
-├─ Primary Realm: acme-corp
-│  └─ Users: [alice@acme, bob@acme]
-│  └─ Default for most operations
-│
-├─ Staging Realm: acme-staging
-│  └─ Users: [dev-alice@acme, dev-bob@acme]
-│  └─ For testing identity features
-│
-└─ EU Realm: acme-eu
-   └─ Users: [pierre@acme-eu, maria@acme-eu]
-   └─ EU data residency compliance
+```mermaid
+graph TD
+    T["ACME Corporation - Tenant"]
+    R1["Primary Realm: acme-corp\nUsers: alice, bob\nDefault for most operations"]
+    R2["Staging Realm: acme-staging\nUsers: dev-alice, dev-bob\nFor testing identity features"]
+    R3["EU Realm: acme-eu\nUsers: pierre, maria\nEU data residency compliance"]
 
+    T --> R1
+    T --> R2
+    T --> R3
+```
+
+```
 // All realms share the same tenant_id (ACME's organizational UUID)
 // But each has independent configuration and user base
 ```
